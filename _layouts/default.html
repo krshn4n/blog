@@ -47,14 +47,15 @@
         <footer class="footer">
           {% include svg-icons.html %}
         </footer>
-		<footer class="tags">{% if page.tags.length > 0%}
+		<footer class="tags">{% if page.tags.size > 0%}
 		[
   {% for tag in page.tags %}
     {% capture tag_name %}{{ tag }}{% endcapture %}
     <a href="/blog/tag/{{ tag_name }}"><code class="highligher-rouge"><nobr>{{ tag_name }}</nobr></code>&nbsp;</a>
   {% endfor %}
+]
   {% endif %}
-]</span>
+</span>
       </div>
     </div>
 

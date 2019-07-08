@@ -1,0 +1,51 @@
+---
+layout: post
+title: ADFS and the trailing slash
+categories: []
+tags:
+- ADFS
+- Web Client
+- WebDrawer
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>The problem</h1>
+<p>Those who have experimented with ADFS authentication for the web client (or Web Drawer) may have noticed that if the trailing slash is not included in the URL then the authentication fails.</p>
+<h1>The solution</h1>
+<p>The solution is to include a trailing slash.</p>
+<h1>The details</h1>
+<p>What is actually going on here is not, technically a bug, but a feature.  The slashes in the URL separate out the realms. So when the trailing slash is ommitted ADFS considers that rather than authenticating with the HPRMWebClient realm you are actually opening the page HPRMWebClient in the www.myserver.com realm.</p>
+<h1>A 'better' solution?</h1>
+<p>I have experimented with this a fair bit, one solution would be for us to re-design the Web Client so that, for example, the base URL was /HPRMWebClient/home.  This may be a solution for the future but what about the present.  IIS URL re-write had some promise but from what I can see the ADFS authentication module kicks in before the rewrite.</p>
+<h1>So...</h1>
+<p>This <a href="http://stackoverflow.com/questions/4460720/error-a-signinresponse-message-may-only-redirect-within-the-current-web-applic">post </a>on stackoverflow provided a handy shortcut to a solution, override the authentication module to append the trailing slash if it is missing.  I have added the <a href="https://integrationhprm.codeplex.com/SourceControl/latest#82/FixedWSFederationAuthenticationModule/">code</a>, or you can download the <a href="https://integrationhprm.codeplex.com/releases/view/618881">DLL</a>. To use this:</p>
+<ol>
+<li>copy the DLL to the web client bin folder,</li>
+<li>edit your web.config modules section to look like the below, and</li>
+<li>ensure that the identifier in your ADFS relying party trust is the same as your web client base URL (e.g. https://myserver.com/HPRMWebClient/)</li>
+</ol>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">modules</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"FixedWSFederationAuthenticationModule"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"FixedWSFederationAuthenticationModule.FixedWSFederationAuthenticationModule, FixedWSFederationAuthenticationModule"</span> <span class="cm-attribute">preCondition</span>=<span class="cm-string">"managedHandler"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"SessionAuthenticationModule"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Services.SessionAuthenticationModule, System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="cm-attribute">preCondition</span>=<span class="cm-string">"managedHandler"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">modules</span><span class="cm-tag cm-bracket">&gt;</span>
+</pre>
+<h1>An update on the Web Client and Web Client classic</h1>
+<p>If you deal with the trailing slash using the technique above in both the web client and web client classic then you will have one more thing to do.  The web client enables linking to the web client classic, if the base address does not include the trailing slash this will fail.  To fix this:</p>
+<ol dir="ltr">
+<li>edit hprmServiceAPI.config in the web client folder,</li>
+<li>find the setup element, then</li>
+<li>change the webClientClassicUrl to include a trailing slash.</li>
+</ol>
+<p>For example:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">setup</span> 
+    <span class="cm-attribute">databaseId</span>=<span class="cm-string">"T1"</span> 
+    <span class="cm-attribute">webClientClassicUrl</span>=<span class="cm-string">"/HPRMWebClientClassic/"</span> 
+    <span class="cm-attribute">searchAhead</span>=<span class="cm-string">"false"</span> 
+    <span class="cm-attribute">advancedSearch</span>=<span class="cm-string">"false"</span> 
+    <span class="cm-attribute">workpath</span>=<span class="cm-string">"C:\HP Records Manager\ServiceAPIWorkpath\Uploads"</span><span class="cm-tag cm-bracket">/&gt;</span></pre>
+</body></html>

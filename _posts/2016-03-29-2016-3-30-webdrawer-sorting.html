@@ -1,0 +1,63 @@
+---
+layout: post
+title: WebDrawer sorting
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Intro</h1>
+<p>Chatting with one of our customers I mentioned that implementing sorting in WebDrawer would be pretty simple to implement, probably time to demonstrate that.  Life has been fairly full lately coming up to the pointy end of a release cycle at work and also at home with the imminent arrival of son number 3.  Anyway, took a break from scheduled work this morning...</p>
+<h1>The scenario</h1>
+<p>By default the only sort-able property in the record search results is the record number.  You can, however, easily add other properties via the route defaults in hptrim.config, this is documented in the ServiceAPI help and in a number of previous posts on this site.  If you have sortable columns in the search results this code will allow you to convert them to links to sort your search results.</p>
+<h1>The Code (step 1)</h1>
+<p>In 83 you will be editing resultsList.cshtml, in prior versions edit searchResults.cshtml.</p>
+<p>Add this code to the top, immediately below any 'using' statements.</p>
+<pre class="source-code">@functions {
+
+    public string getSort(PropertyOrFieldDef pfdef)
+    {        
+        if (pfdef.IsAProperty <span class="cm-error">&amp;</span><span class="cm-error">&amp;</span> pfdef.Property.SearchClauseId != SearchClauseIds.Unknown)
+        {
+            var searchClauses = this.TrimHelper.SearchClausesFor(this.TrimHelper.TrimType);
+            SearchClauseDef searchClause = searchClauses.First(sc =&gt; sc.Id == pfdef.Property.SearchClauseId);
+            var qs = new System.Collections.Specialized.NameValueCollection(this.Request.QueryString);
+            
+            string sortBy = searchClause.Name + "-";
+            foreach (string key in qs.Keys)
+            {
+                if (qs[key] == searchClause.Name + "-")
+                {
+                    sortBy = searchClause.Name;
+                }                
+            }
+            qs["sortby"] = sortBy;
+            return qs.ToFormUrlEncoded();
+        }
+        return null;
+    }
+}</pre>
+<h1>The Code (step 2)</h1>
+<p>Next find the TH element and replace it with this.</p>
+<pre class="source-code">var sortUrl = getSort(pfdef);
+if (sortUrl != null)
+{                               
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">th</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"?@sortUrl"</span><span class="cm-tag cm-bracket">&gt;</span>@pfdef.Caption<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">th</span><span class="cm-tag cm-bracket">&gt;</span>
+}
+else
+{
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">th</span><span class="cm-tag cm-bracket">&gt;</span>@pfdef.Caption<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">th</span><span class="cm-tag cm-bracket">&gt;</span>
+}</pre>
+<h1>Warning</h1>
+<p>I have done minimal testing on this, use at your own risk.</p>
+<h1>Update for 9.x</h1>
+<p>Due to a change in the underlying framework in 9.x we have one change required in the above code.  The line that once looked like this:</p>
+<pre class="source-code"><span class="cm-keyword">var</span> <span class="cm-def">qs</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">System</span>.<span class="cm-property">Collections</span>.<span class="cm-property">Specialized</span>.<span class="cm-property">NameValueCollection</span>(<span class="cm-keyword">this</span>.<span class="cm-property">Request</span>.<span class="cm-property">QueryString</span>);</pre>
+<p>should now look like this:</p>
+<pre class="source-code"><span class="cm-keyword">var</span> <span class="cm-def">qs</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">System</span>.<span class="cm-property">Collections</span>.<span class="cm-property">Specialized</span>.<span class="cm-property">NameValueCollection</span>(<span class="cm-variable">HttpContext</span>.<span class="cm-property">Current</span>.<span class="cm-property">Request</span>.<span class="cm-property">QueryString</span>);</pre>
+</body></html>

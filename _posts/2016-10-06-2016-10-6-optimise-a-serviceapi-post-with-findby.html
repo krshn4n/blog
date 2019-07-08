@@ -1,0 +1,40 @@
+---
+layout: post
+title: Optimise a ServiceAPI post with FindBy
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>The most obvious way to specify a RecordType, Container, Location or other object property is using its Uri, for example you might post this to create a new Record:</p>
+<pre class="source-code">{
+    <span class="cm-string">"RecordTitle"</span>: <span class="cm-string">"My Title"</span>,
+    <span class="cm-string">"RecordRecordType"</span>: {<span class="cm-string">"Uri"</span>: <span class="cm-number">1</span>}
+}</pre>
+<h1>FindBy</h1>
+<p dir="ltr">If you know the Uri then all is good, if not you will have to make a separate request to find the Uri.  If you do not know the Uri but do have some other unique information about the object, such as its name, or relationship to you (e.g. supervisorOf:Me) then you may use the FindBy, for example:</p>
+<pre class="source-code">{
+    <span class="cm-string">"RecordTitle"</span>: <span class="cm-string">"My Title"</span>,
+    <span class="cm-string">"RecordRecordType"</span>: {<span class="cm-string">"FindBy"</span>:<span class="cm-string">"name:Document"</span>}
+}</pre>
+<p>This method may be used with a standard and multipart form post as well, simply post the string rather than the Uri, for example:</p>
+<pre class="source-code">------WebKitFormBoundary8Pd5W3BlMsyEl0k8
+Content-Disposition: form-data; name="RecordRecordType"
+
+name:Document
+------WebKitFormBoundary8Pd5W3BlMsyEl0k8
+Content-Disposition: form-data; name="RecordTitle"
+
+My Title
+------WebKitFormBoundary8Pd5W3BlMsyEl0k8--</pre>
+<h1>Beware</h1>
+<p dir="ltr">The FindBy is a standard search string so you can use any search you want, the only limitation is that it must match one and only one object, if zero, or more than one matches are found the entire request will fail.</p>
+<h1>Demonstration</h1>
+<p>The following video demonstrates this via Postman.</p>
+<iframe src="https://player.vimeo.com/video/185776686" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+</body></html>

@@ -1,0 +1,24 @@
+---
+layout: post
+title: Fun with 82 - Low impact CSS WebDrawer customisation
+categories: []
+tags:
+- '82'
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Custom_Head</h1>
+<p>In HPRM 82 we introduce a simple new feature to allow you to inject your own code into the head portion of every WebDrawer page without changing any of the core templates.  This is done simply by adding the file custom_head.cshtml anywhere below your Views folder.</p>
+<h1>Watch it happen</h1>
+<iframe src="https://player.vimeo.com/video/134804822" width="500" height="375" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><h1 id="yui_3_17_2_4_1438142022971_2760">The Code</h1>
+<p>This is the CSS I use to hide the Location quick search.</p>
+<pre class="source-code"><span class="cm-builtin">#quick-search-forms</span> &gt; <span class="cm-tag">form</span>:<span class="cm-variable-3">first-child</span> +  <span class="cm-tag">hr</span>,
+<span class="cm-builtin">#quick-search-forms</span> &gt; <span class="cm-tag">form</span>:<span class="cm-variable-3">first-child</span> +  <span class="cm-tag">hr</span> + <span class="cm-tag">form</span> {
+    <span class="cm-property">display</span>:<span class="cm-atom">none</span>;
+}</pre>
+</body></html>

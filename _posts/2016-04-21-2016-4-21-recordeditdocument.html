@@ -1,0 +1,41 @@
+---
+layout: post
+title: Record.EditDocument
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>I spend as little time with the COM SDK as possible but apparently it had the method Record.EditDocument which would check a document out to Offline Records and open it for editing.  This no longer exists in the .Net SDK but you can still achieve the same end. Here is a simple sample.</p>
+<pre class="source-code"><span class="cm-variable">using</span> (<span class="cm-variable">Database</span> <span class="cm-variable">database</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Database</span>())
+{
+    <span class="cm-variable">database</span>.<span class="cm-property">WorkgroupServerName</span> <span class="cm-operator">=</span> <span class="cm-string">"local"</span>;
+    <span class="cm-variable">database</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"I1"</span>;
+    <span class="cm-variable">database</span>.<span class="cm-property">Connect</span>();
+
+    <span class="cm-variable">Record</span> <span class="cm-variable">record</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Record</span>(<span class="cm-variable">database</span>, <span class="cm-number">9000000001</span>);
+
+    <span class="cm-variable">OfflineRecord</span> <span class="cm-variable">offline</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">OfflineRecord</span>(<span class="cm-variable">record</span>, <span class="cm-atom">true</span>);
+    <span class="cm-variable">System</span>.<span class="cm-property">Diagnostics</span>.<span class="cm-property">Process</span>.<span class="cm-property">Start</span>(<span class="cm-variable">offline</span>.<span class="cm-property">FullFileName</span>);
+}</pre>
+<h1>Auto Checkin</h1>
+<p dir="ltr">If you want to auto check the document in once you have finished editing then call the SetAutoCheckin() methd, for example:</p>
+<pre class="source-code"><span class="cm-variable">using</span> (<span class="cm-variable">Database</span> <span class="cm-variable">database</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Database</span>())
+{
+    <span class="cm-variable">database</span>.<span class="cm-property">WorkgroupServerName</span> <span class="cm-operator">=</span> <span class="cm-string">"local"</span>;
+    <span class="cm-variable">database</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"I1"</span>;
+    <span class="cm-variable">database</span>.<span class="cm-property">Connect</span>();
+
+    <span class="cm-variable">Record</span> <span class="cm-variable">record</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Record</span>(<span class="cm-variable">database</span>, <span class="cm-string">"REC_15"</span>);
+    
+    <span class="cm-variable">OfflineRecord</span> <span class="cm-variable">offline</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">OfflineRecord</span>(<span class="cm-variable">record</span>, <span class="cm-atom">true</span>);
+    <span class="cm-variable">record</span>.<span class="cm-property">SetAutoCheckin</span>(<span class="cm-variable">offline</span>.<span class="cm-property">FileName</span>);
+
+    <span class="cm-variable">System</span>.<span class="cm-property">Diagnostics</span>.<span class="cm-property">Process</span>.<span class="cm-property">Start</span>(<span class="cm-variable">offline</span>.<span class="cm-property">FullFileName</span>);
+}</pre>
+</body></html>

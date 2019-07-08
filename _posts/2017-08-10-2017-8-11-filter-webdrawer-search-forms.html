@@ -1,0 +1,43 @@
+---
+layout: post
+title: Filter WebDrawer Search Forms
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>Lets say you have designed multiple search forms which are used via WebDrawer.  These forms provide different fields with which to search.  In addition to this you may also want to filter the results for each form to make them appropriate for the target audience.</p>
+<h1>Embedding the filter</h1>
+<p>One approach is to embed a filter based on the search form name. I did this by:</p>
+<ol>
+<li>editing Views\Search.cshhtml</li>
+<li>enable 'Name' retrieval for the search form</li>
+<li>add a filter field based on the name.</li>
+</ol>
+<h1>Name retrieval</h1>
+<p>Near the top of Search.cshtml you will see code that looks like this</p>
+<pre class="source-code"><span class="cm-variable">searchForm</span> <span class="cm-operator">=</span> <span class="cm-variable">TrimHelper</span>.<span class="cm-property">Search</span><span class="cm-operator">&lt;</span><span class="cm-variable">SearchForm</span><span class="cm-operator">&gt;</span>(
+    <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-property">SearchForm</span>,
+    <span class="cm-string">"all"</span>,
+    <span class="cm-variable">properties</span>: <span class="cm-keyword">new</span> <span class="cm-variable">string</span>[] { <span class="cm-string">"ObjectType"</span>, <span class="cm-string">"DefinitionForm"</span> }).<span class="cm-property">FirstOrDefault</span>();</pre>
+<p>Add the property 'Name' in the propert list, so that it now looks like this:</p>
+<pre class="source-code"><span class="cm-variable">searchForm</span> <span class="cm-operator">=</span> <span class="cm-variable">TrimHelper</span>.<span class="cm-property">Search</span><span class="cm-operator">&lt;</span><span class="cm-variable">SearchForm</span><span class="cm-operator">&gt;</span>(
+    <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-property">SearchForm</span>,
+    <span class="cm-variable">sfName</span>,
+    <span class="cm-variable">properties</span>: <span class="cm-keyword">new</span> <span class="cm-variable">string</span>[] { <span class="cm-string">"ObjectType"</span>, <span class="cm-string">"DefinitionForm"</span>, <span class="cm-string">"Name"</span> }).<span class="cm-property">FirstOrDefault</span>();<span class="cm-operator">&lt;</span><span class="cm-variable">p</span><span class="cm-operator">&gt;</span><span class="cm-variable">Hello</span>, <span class="cm-variable">World</span><span class="cm-operator">!</span></pre>
+<h1>Add the filter</h1>
+<p dir="ltr">Further down the page is found the search form itself, starting with this HTML:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">form</span> <span class="cm-attribute">id</span>=<span class="cm-string">"search-form-form"</span> <span class="cm-attribute">class</span>=<span class="cm-string">"form-horizontal search-form"</span> <span class="cm-attribute">action</span>=<span class="cm-string">"FormSearch"</span> <span class="cm-attribute">method</span>=<span class="cm-string">"GET"</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<p>After this line add some code to insert a filter INPUT element, potentially different for each search form.  The code below add a filter for the search form named 'Test Form'</p>
+<pre class="source-code">@if (searchForm.Name == "Test Form")
+{
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">type</span>=<span class="cm-string">"hidden"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"filter"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"recType:Document"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+}</pre>
+<h1>Warning</h1>
+<p dir="ltr">This is a convenience, not a security measure.  For example a user could still modify the URL resulting from this search to avoid the filtering.</p>
+</body></html>

@@ -1,0 +1,28 @@
+---
+layout: post
+title: WebDrawer Error Message
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>In WebDrawer 8.2 and 8.3 you might see the error message below...</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_58db0c381b631bb61383dd7d_1490750522939_bad_error.PNG_" alt="">
+  
+
+<p>This error reflects the fact that an error has occurred in the process of parsing an error message, so you have an error but do not know what it is. A better error message might look like this...</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_58db0ccc725e25892c37bd41_1490750673479__img.png_" alt="">
+  
+
+<p>To fix this problem edit the hptrim.config file and add the uploadBasePath as seen below.  The uploadBasePath is not used by WebDrawer but the error handling in the underlying framework needs it. </p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">hptrim</span> 
+    <span class="cm-attribute">uploadBasePath</span>=<span class="cm-string">"[Not Used]"</span>
+    <span class="cm-attribute">...</span></pre>
+</body></html>

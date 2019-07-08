@@ -1,0 +1,31 @@
+---
+layout: post
+title: ServiceAPI impersonation
+categories: []
+tags:
+- ServiceAPI
+- Authentication
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>The configuration section of the ServiceAPI help documents a handy little property called 'trustedToImpersonate'.  This allows your ServiceAPI to choose to trust one or more calling services.</p>
+<h1>Scenario</h1>
+<p>This can be useful in a server to server scenario where passing the actual user credentials to the ServiceAPI is not practical.</p>
+<h1>Configuration</h1>
+<p dir="ltr">To allow a particular account to impersonate others users set their name in the hptrim.config file as seen below.  TrustedToImpersonate is a regular expression so you can list multiple accounts if you need to.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">hptrim</span>
+  <span class="cm-attribute">serviceFeatures</span>=<span class="cm-string">"Razor,Html,Json,Xml,PredefinedRoutes"</span> 
+  <span class="cm-attribute">trustedToImpersonate</span>=<span class="cm-string">"trim\\davidc"</span>
+  <span class="cm-attribute">...</span>
+<span class="cm-tag cm-error">&lt;/hptrim&gt;       </span></pre>
+<h1>Usage</h1>
+<p>To impersonate someone using the .Net client librarys use the SetUserToImpersonate() method.</p>
+<pre class="source-code"><span class="cm-tag">TrimClient</span> <span class="cm-tag">client</span> = <span class="cm-tag">new</span> <span class="cm-tag">TrimClient</span>(<span class="cm-string">"http://MyServer/ServiceAPI"</span>);
+<span class="cm-tag">client</span><span class="cm-qualifier">.Credentials</span> = <span class="cm-tag">new</span> <span class="cm-tag">NetworkCredential</span>(<span class="cm-string">"davidc"</span>, <span class="cm-string">"my password"</span>, <span class="cm-string">"trim"</span>);
+<span class="cm-tag">client</span><span class="cm-qualifier">.SetUserToImpersonate</span>(<span class="cm-string">"someone\\else"</span>);</pre>
+<p>To impersonate from a different context simply send an HTTP header named 'userToImpersonate' with the value being the user's name along with each request.</p>
+</body></html>

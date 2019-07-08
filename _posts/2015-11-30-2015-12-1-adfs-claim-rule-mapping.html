@@ -1,0 +1,25 @@
+---
+layout: post
+title: ADFS claim rule mapping
+categories: []
+tags:
+- ServiceAPI
+- ADFS
+- WebDrawer
+- Web Client
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Map User-Principal-Name to Name</h1>
+<p>This is a for those of you who notice a gap in the current RM Web Client ADFS configuration documentation.  The documentation for the RM native client specifies the Relying Party claim rule should have the LDAP attribute User-Principle-Name mapped to the outgoing claim UPN.  The Web Client documentation contains a simple custom rule but does not specify exactly which claims are are required.  Unlike the native client the User-Principal-Name must be mapped to the outgoing claim Name, like this:</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_565cc9a0e4b027c789c0c588_1448921505422__img.png_" alt="">
+  
+
+<h1 id="yui_3_17_2_4_1448920522457_2944">Some good news</h1>
+<p>In a an upcoming version we plan to support UPN for the web client, which will check UPN first and then Name, using whichever is sent by ADFS.</p>
+</body></html>

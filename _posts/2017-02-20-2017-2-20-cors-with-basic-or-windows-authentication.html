@@ -1,0 +1,75 @@
+---
+layout: post
+title: CORS with Basic or Windows Authentication
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Update</h1>
+<p dir="ltr">Along with one of our customers I rethought the approach below to integrate everything into the module, see the <a href="https://github.com/HPECM/Community/tree/master/Samples/ServiceAPI/CSharp/CORSModule">sample </a>for more details.</p>
+<h1>Intro</h1>
+<p>In the ServiceAPI help there is a sample on how to use the CORS feature.  There are some limitations in this feature that make it unlikely to work for most ServiceAPI users.</p>
+<h1>Preflight</h1>
+<p>When using a browser, maybe via jQuery, the odds are that a preflight request will be sent.  This is an HTTP OPTIONS request to confirm that the correct CORS headers are returned.  This request is sent without any authentication.  The problem when using IIS basic or integrated authentication is that this request will be rejected.</p>
+<h1>The solution</h1>
+<p>The solution is not to use the CORS feature at all but to fall back on traditional ASP.Net techniques, as detailed in this <a href="https://evolpin.wordpress.com/2012/10/12/the-cors/">very helpful post</a> .  </p>
+<h2>Module</h2>
+<p>Firstly write a, ASP.Net Module to allow us to get into the pipeline before IIS rejects our request, compile this in Visual Studio and place the DLL in the ServiceAPI bin folder.  All OPTIONS requests will now be returned with the status 200.</p>
+<pre class="source-code"><span class="cm-variable">public</span> <span class="cm-keyword">class</span> <span class="cm-variable">CORSModule</span> : <span class="cm-variable">IHttpModule</span>
+{
+    <span class="cm-variable">public</span> <span class="cm-variable">void</span> <span class="cm-variable">Dispose</span>()  { }
+
+    <span class="cm-variable">public</span> <span class="cm-variable">void</span> <span class="cm-variable">Init</span>(<span class="cm-variable">HttpApplication</span> <span class="cm-variable">context</span>)
+    {
+        <span class="cm-variable">context</span>.<span class="cm-property">PreSendRequestHeaders</span> <span class="cm-operator">+=</span> <span class="cm-variable">delegate</span>
+        {
+            <span class="cm-keyword">if</span> (<span class="cm-variable">context</span>.<span class="cm-property">Request</span>.<span class="cm-property">HttpMethod</span> <span class="cm-operator">==</span> <span class="cm-string">"OPTIONS"</span>)
+            {
+                <span class="cm-keyword">var</span> <span class="cm-variable">response</span> <span class="cm-operator">=</span> <span class="cm-variable">context</span>.<span class="cm-property">Response</span>;
+                <span class="cm-variable">response</span>.<span class="cm-property">StatusCode</span> <span class="cm-operator">=</span> (<span class="cm-variable">int</span>)<span class="cm-variable">HttpStatusCode</span>.<span class="cm-property">OK</span>;
+            }
+        };
+    }
+}</pre>
+<h2>Configure module</h2>
+<p dir="ltr">Now we wire the module into our service in the system.webServer\modules element...</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">modules</span> <span class="cm-attribute">runAllManagedModulesForAllRequests</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"CORSModule"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"CORSModule"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">modules</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>Set CORS headers</h2>
+<p dir="ltr">Lastly we add the CORS headers to system.webServer\httpProtocol</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">customHeaders</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Access-Control-Allow-Methods"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"POST,GET,OPTIONS"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Access-Control-Allow-Origin"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"http://localhost"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Access-Control-Allow-Headers"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"Content-Type,Authorization"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Access-Control-Allow-Credentials"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">customHeaders</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>Test it out</h2>
+<p>Once you have implemented the above the jQuery code like this should be successful in accessing a ServiceAPI instance using basic authentication.</p>
+<pre class="source-code"><span class="cm-variable">$</span>.<span class="cm-property">ajax</span>({
+    <span class="cm-property">beforeSend</span>: <span class="cm-keyword">function</span> (<span class="cm-def">xhr</span>) {
+            <span class="cm-variable-2">xhr</span>.<span class="cm-property">setRequestHeader</span>(<span class="cm-string">"Authorization"</span>, <span class="cm-string">"Basic "</span> <span class="cm-operator">+</span> <span class="cm-variable">btoa</span>(<span class="cm-string">"USERNAME"</span> <span class="cm-operator">+</span> <span class="cm-string">":"</span> <span class="cm-operator">+</span> <span class="cm-string">"PASSWORD"</span>));
+    },
+
+    <span class="cm-property">url</span>: <span class="cm-string">"http://davidc2012r2/ServiceAPI82/Record/1?&amp;properties=RecordTitle"</span>,
+    <span class="cm-property">type</span>: <span class="cm-string">'GET'</span>,
+    <span class="cm-property">dataType</span>: <span class="cm-string">'json'</span>,
+})
+.<span class="cm-property">done</span>(<span class="cm-keyword">function</span> (<span class="cm-def">response</span>, <span class="cm-def">statusText</span>) {
+    
+    <span class="cm-keyword">if</span> (<span class="cm-variable-2">statusText</span> <span class="cm-operator">===</span> <span class="cm-string">"success"</span>) {
+        <span class="cm-variable">alert</span>(<span class="cm-string">"Record named: "</span> <span class="cm-operator">+</span> <span class="cm-variable-2">response</span>.<span class="cm-property">Results</span>[<span class="cm-number">0</span>].<span class="cm-property">RecordTitle</span>.<span class="cm-property">Value</span> <span class="cm-operator">+</span> <span class="cm-string">" was found."</span>);
+    }
+})
+.<span class="cm-property">fail</span>(<span class="cm-keyword">function</span> (<span class="cm-def">xhr</span>) {
+    <span class="cm-keyword">var</span> <span class="cm-def">err</span> <span class="cm-operator">=</span> <span class="cm-variable">eval</span>(<span class="cm-string">"("</span> <span class="cm-operator">+</span> <span class="cm-variable-2">xhr</span>.<span class="cm-property">responseText</span> <span class="cm-operator">+</span> <span class="cm-string">")"</span>);
+    <span class="cm-variable">alert</span>(<span class="cm-variable-2">err</span>.<span class="cm-property">ResponseStatus</span>.<span class="cm-property">Message</span>);
+
+});</pre>
+</body></html>

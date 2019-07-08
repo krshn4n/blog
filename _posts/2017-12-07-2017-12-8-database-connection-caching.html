@@ -1,0 +1,70 @@
+---
+layout: post
+title: Database connection caching
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>Previously if you wanted to avoid the overhead of Database.Connect() in a web service application you had to write some sort of <a href="https://github.com/HPECM/Community/tree/master/Samples/SDK/CSharp/DatabasePool">connection pool</a>. In 9.2 this is no longer required as the SDK itself caches connections.  The requirements are that:</p>
+<ul dir="ltr">
+<li>the previous connection must be Disposed,</li>
+<li>the subsequent connection must have the same Database Id, work group server name  and trusted user.</li>
+</ul>
+<h1>Sample Code</h1>
+<pre class="source-code"><span class="cm-variable">private</span> <span class="cm-variable">static</span> <span class="cm-variable">Database</span> <span class="cm-variable">getDatabase</span>(<span class="cm-variable">string</span> <span class="cm-variable">user</span> <span class="cm-operator">=</span> <span class="cm-atom">null</span>)
+{
+    <span class="cm-variable">Database</span> <span class="cm-variable">database</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Database</span>();
+    <span class="cm-variable">database</span>.<span class="cm-property">WorkgroupServerName</span> <span class="cm-operator">=</span> <span class="cm-string">"local"</span>;
+    <span class="cm-variable">database</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"L1"</span>;
+    <span class="cm-keyword">if</span> (<span class="cm-variable">user</span> <span class="cm-operator">!=</span> <span class="cm-atom">null</span>)
+    {
+        <span class="cm-variable">database</span>.<span class="cm-property">TrustedUser</span> <span class="cm-operator">=</span> <span class="cm-variable">user</span>;
+    }
+    <span class="cm-variable">_watch</span>.<span class="cm-property">Reset</span>();
+    <span class="cm-variable">_watch</span>.<span class="cm-property">Start</span>();
+    <span class="cm-variable">database</span>.<span class="cm-property">Connect</span>();
+    <span class="cm-variable">_watch</span>.<span class="cm-property">Stop</span>();
+
+    <span class="cm-variable">Console</span>.<span class="cm-property">WriteLine</span>(<span class="cm-variable">_watch</span>.<span class="cm-property">ElapsedMilliseconds</span>);
+
+    <span class="cm-keyword">return</span> <span class="cm-variable">database</span>;
+}
+
+
+<span class="cm-variable">private</span> <span class="cm-variable">static</span> <span class="cm-variable">void</span> <span class="cm-variable">connectDatabase</span>()
+{
+    <span class="cm-variable">string</span> <span class="cm-variable">trustedUser</span> <span class="cm-operator">=</span> <span class="cm-string">"itu_tadmin"</span>;
+    <span class="cm-variable">using</span> (<span class="cm-keyword">var</span> <span class="cm-variable">db</span> <span class="cm-operator">=</span> <span class="cm-variable">getDatabase</span>(<span class="cm-variable">trustedUser</span>))
+    {
+    }
+
+    <span class="cm-variable">using</span> (<span class="cm-keyword">var</span> <span class="cm-variable">db2</span> <span class="cm-operator">=</span> <span class="cm-variable">getDatabase</span>(<span class="cm-variable">trustedUser</span>))
+    {
+    }
+
+    <span class="cm-variable">using</span> (<span class="cm-keyword">var</span> <span class="cm-variable">db2</span> <span class="cm-operator">=</span> <span class="cm-variable">getDatabase</span>(<span class="cm-variable">trustedUser</span>))
+    {
+    }
+}
+
+
+
+<span class="cm-variable">static</span> <span class="cm-variable">void</span> <span class="cm-variable">Main</span>(<span class="cm-variable">string</span>[] <span class="cm-variable">args</span>)
+{
+    <span class="cm-variable">TrimApplication</span>.<span class="cm-property">TrimBinariesLoadPath</span> <span class="cm-operator">=</span> @<span class="cm-string">"Your bin folder"</span>;
+    <span class="cm-variable">TrimApplication</span>.<span class="cm-property">Initialize</span>();
+    <span class="cm-variable">TrimApplication</span>.<span class="cm-property">SetAsWebService</span>(<span class="cm-string">"c:\\junk"</span>);
+
+    <span class="cm-variable">connectDatabase</span>();
+
+}</pre>
+<h1>Demonstration</h1>
+ 
+   <iframe src="https://player.vimeo.com/video/246351860?wmode=opaque" width="576" height="360" frameborder="0" title="database_cache" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+</body></html>

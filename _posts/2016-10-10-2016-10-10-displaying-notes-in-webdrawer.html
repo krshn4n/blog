@@ -1,0 +1,43 @@
+---
+layout: post
+title: Displaying Notes in WebDrawer
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>Someone just pointed out that Record Notes do not display in the WebDrawer details page.  We hope to fix that in an upcoming 9.x release but if you want to patch it manually here is how.</p>
+<h1>First</h1>
+<p>Before you fix WebDrawer to allow it to display Notes make sure you have added Notes to the routeDefaults, for example:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span>
+    <span class="cm-attribute">name</span>=<span class="cm-string">"Record"</span>
+    <span class="cm-attribute">model</span>=<span class="cm-string">"RecordFind"</span>
+    <span class="cm-attribute">template</span>=<span class="cm-string">"WDRecordDetails"</span>
+    <span class="cm-attribute">properties</span>=<span class="cm-string">"NameString,RecordIsElectronic,enabledcommandids,RecordRelatedRecs,RecordIsContainer,RecordIsInPartSeries,RecordRecordType,RecordPrimaryContact,Notes"</span>
+    <span class="cm-attribute">propertySets</span>=<span class="cm-string">"Identification,Locations,Electronic,Action,ChildLists,ChildDetails,Parts,Archiving,Container,Other"</span>
+<span class="cm-tag cm-bracket">/&gt;</span></pre>
+<h1>The Update</h1>
+<h2> Edit string resources</h2>
+<p>Add the label 'Notes' to the string resources by editing App_GlobalResources\lang.resx and adding the followg XML before the end tag &lt;/root&gt;.</p>
+<pre class="source-code">  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">data</span> <span class="cm-attribute">name</span>=<span class="cm-string">"field_groups_notes"</span> <span class="cm-attribute">xml:space</span>=<span class="cm-string">"preserve"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">value</span><span class="cm-tag cm-bracket">&gt;</span>Notes<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">value</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">data</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>Update detailsView.cshtml</h2>
+<p>Follow these steps to update the file Views\Shared\detailsView.cshtml. </p>
+<h3>Add Notes variable</h3>
+<p>Add this below the line that reads 'string jr_other = 'jr_other'</p>
+<pre class="source-code"><span class="cm-variable">string</span> <span class="cm-variable">notes</span> <span class="cm-operator">=</span> <span class="cm-string">"notes"</span>;</pre>
+<h3>Add field group</h3>
+<p>Inside the initialisation for the fieldGroups array add this line:</p>
+<pre class="source-code"><span class="cm-keyword">new</span> { <span class="cm-property">Caption</span> <span class="cm-operator">=</span> <span class="cm-variable">Translations</span>.<span class="cm-variable">lang</span>.<span class="cm-variable">field_groups_notes</span>, <span class="cm-variable">Id</span> <span class="cm-operator">=</span> <span class="cm-variable">notes</span>, <span class="cm-variable">forTrimType</span> <span class="cm-operator">=</span> <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-variable">Record</span>},</pre>
+<h3>Add property category</h3>
+<p>After the line that reads 'var propertyCategories = new Dictionary&lt;PropertyIds, string&gt;();' add this:</p>
+<pre class="source-code">propertyCategories.Add(PropertyIds.RecordNotes, notes);</pre>
+<h2>Done</h2>
+<p dir="ltr">Once you have done the above Record Notes should display in a Notes </p>
+</body></html>

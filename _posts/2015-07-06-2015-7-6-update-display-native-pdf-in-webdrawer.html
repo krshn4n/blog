@@ -1,0 +1,100 @@
+---
+layout: post
+title: Update - display native PDF in WebDrawer
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Second Chances</h1>
+<p>Some time ago I wrote this <a href="/2015/4/30/customise-the-webdrawer-html-preview-page">post </a>detailing how to edit the preview page in WebDrawer, turns out I did not put enough time into testing my solution. In Chrome the PDF preview does not always resize correctly and in IE the Links/Actions menu displays under the PDF preview.  This new approach should work better.</p>
+<h1>Instructions</h1>
+<p>All modifications are made in WDRecordPreview.cshtml, ensure you have a backup before commencing.  The full page is available <a href="https://github.com/HPECM/Community/tree/master/Samples/WebDrawer/NativePDFViewer">here </a>and can simply be copied into your Views folder.</p>
+<h1>The details</h1>
+<h2>Page settings</h2>
+<p>At the top of the page the following variables hide the left menu (to allow more screen real estate for the preview) and set a browser detection variable for later use. </p>
+<pre class="source-code"><span class="cm-variable">ViewBag</span>.<span class="cm-property">HideMenu</span> <span class="cm-operator">=</span> <span class="cm-atom">true</span>;
+<span class="cm-variable">bool</span> <span class="cm-variable">isIE</span> <span class="cm-operator">=</span> <span class="cm-variable">Request</span>.<span class="cm-property">UserAgent</span>.<span class="cm-property">Contains</span>(<span class="cm-string">"MSIE"</span>) <span class="cm-operator">||</span> <span class="cm-variable">Request</span>.<span class="cm-property">UserAgent</span>.<span class="cm-property">Contains</span>(<span class="cm-string">"Trident"</span>);</pre>
+<h2>Body</h2>
+<p dir="ltr">The body of the page embeds an iframe to display the native PDF or the HTML preview, depending on document type.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">iframe</span> 
+  <span class="cm-attribute">id</span>=<span class="cm-string">"preview-frame"</span>
+  <span class="cm-attribute">src</span>=<span class="cm-string">"~/@("</span><span class="cm-attribute">Record</span><span class="cm-attribute">/</span><span class="cm-string cm-error">" + @Model.Results[0].Uri + "</span><span class="cm-attribute">/file</span><span class="cm-attribute">/</span><span class="cm-string cm-error">" + (record.Extension == "</span><span class="cm-attribute">PDF</span><span class="cm-string cm-error">" ? "</span><span class="cm-attribute">document?inline</span><span class="cm-string cm-error">" : "</span><span class="cm-attribute">html</span><span class="cm-string cm-error">"))"</span>
+  <span class="cm-attribute">width</span>=<span class="cm-string">'100%'</span>
+  <span class="cm-attribute">height</span>=<span class="cm-string">'100%'</span>
+  <span class="cm-attribute">style</span>=<span class="cm-string">"border:none; margin-left:10px; visibility:hidden;"</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">iframe</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>HTML head</h2>
+<p dir="ltr">The customhead section injects some CSS to tidy up the page layout.</p>
+<pre class="source-code">@section customhead {
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag">h2</span> {
+            <span class="cm-property">white-space</span>: <span class="cm-atom">normal</span>;
+        }
+
+        <span class="cm-builtin">#contentcolumn</span> {
+            <span class="cm-property">height</span>: <span class="cm-atom">auto</span>;
+            <span class="cm-property">padding-bottom</span>: <span class="cm-number">0</span>;
+        }
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+}</pre>
+<h2>Scripts</h2>
+<p dir="ltr">In the scripts we:</p>
+<ul dir="ltr">
+<li>resize the preview IFRAME based on the window size, and</li>
+<li>hide the preview when the Links/Actions menu is displayed (in IE only) to prevent the menu displaying under the PDF.</li>
+</ul>
+<pre class="source-code">@section scripts {
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-keyword">var</span> <span class="cm-variable">resizePreview</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span> () {
+
+            <span class="cm-keyword">var</span> <span class="cm-def">previewFrame</span> <span class="cm-operator">=</span> <span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>);
+
+            <span class="cm-keyword">if</span> (<span class="cm-variable-2">previewFrame</span>) {
+
+                <span class="cm-variable-2">previewFrame</span>.<span class="cm-property">show</span>();
+                <span class="cm-variable-2">previewFrame</span>.<span class="cm-property">css</span>({ <span class="cm-string cm-property">"visibility"</span>: <span class="cm-string">"visible"</span> });
+
+                <span class="cm-keyword">var</span> <span class="cm-def">previewOffSet</span> <span class="cm-operator">=</span> <span class="cm-variable-2">previewFrame</span>.<span class="cm-property">offset</span>();
+                <span class="cm-keyword">if</span> (<span class="cm-variable-2">previewOffSet</span>) {
+                    <span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-variable">$</span>(<span class="cm-variable">window</span>).<span class="cm-property">height</span>() <span class="cm-operator">-</span> (<span class="cm-variable-2">previewOffSet</span>.<span class="cm-property">top</span> <span class="cm-operator">+</span> <span class="cm-number">5</span>);
+                    <span class="cm-variable-2">previewFrame</span>.<span class="cm-property">height</span>(<span class="cm-variable-2">height</span>);
+
+                    <span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-variable">$</span>(<span class="cm-variable">window</span>).<span class="cm-property">width</span>() <span class="cm-operator">-</span> <span class="cm-number">10</span>;
+
+                    <span class="cm-keyword">if</span> (<span class="cm-variable-2">width</span> <span class="cm-operator">&gt;</span> <span class="cm-number">630</span>) {
+                        <span class="cm-variable-2">width</span> <span class="cm-operator">=</span> <span class="cm-variable-2">width</span> <span class="cm-operator">-</span> (<span class="cm-variable">$</span>(<span class="cm-string">'#leftcolumn'</span>).<span class="cm-property">width</span>());
+                    }
+                    <span class="cm-variable-2">previewFrame</span>.<span class="cm-property">width</span>(<span class="cm-variable-2">width</span>);
+                }
+            }
+        }
+        <span class="cm-variable">$</span>( <span class="cm-variable">document</span> ).<span class="cm-property">ready</span>(<span class="cm-keyword">function</span>() {
+
+            <span class="cm-variable">$</span>(<span class="cm-variable">window</span>).<span class="cm-property">on</span>(<span class="cm-string">"resize"</span>, <span class="cm-keyword">function</span> () {
+                <span class="cm-variable">resizePreview</span>();
+            });
+            
+            @<span class="cm-keyword">if</span> (<span class="cm-variable">isIE</span> <span class="cm-operator">&amp;&amp;</span> <span class="cm-variable">record</span>.<span class="cm-property">Extension</span> <span class="cm-operator">==</span> <span class="cm-string">"PDF"</span> ) {
+            <span class="cm-operator">&lt;</span><span class="cm-variable">text</span><span class="cm-operator">&gt;</span><span class="cm-variable">$</span>(<span class="cm-string">'.banner btn.dropdown-toggle'</span>).<span class="cm-property">on</span>(<span class="cm-string">"click"</span>, <span class="cm-keyword">function</span> () {
+                <span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>).<span class="cm-property">hide</span>();
+            });
+            
+            <span class="cm-variable">$</span>(<span class="cm-variable">document</span>).<span class="cm-property">on</span>(<span class="cm-string">"click"</span>, <span class="cm-keyword">function</span> () {
+                <span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>).<span class="cm-property">show</span>();
+
+            });<span class="cm-operator">&lt;</span><span class="cm-string-2">/text&gt;</span>
+            }
+            <span class="cm-variable">resizePreview</span>();        
+
+        });
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+}</pre>
+<h1>Rationale for hiding the preview</h1>
+<p>The PDF is embedded via a plugin which does not follow the same rules as other HTML elements, in IE it seems to display always on top.  I chose the option to simply hide the preview as the simplest solution.  An alternate approach is to not display PDF as native but to display the HTML preview inside the IFRAME just as we do for other document types.  There may be other, better, ways to display the native PDF and also overlay the menu, feel free to let me know.</p>
+</body></html>

@@ -1,0 +1,40 @@
+---
+layout: post
+title: Powershell to extract renditions
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>There may be a way to extract all PDF renditions for a selection of Records via the native client but I do not know how to do it.  When I have <a href="https://msdn.microsoft.com/powershell/scripting/getting-started/fundamental/windows-powershell-integrated-scripting-environment--ise-">powershell</a> I don't worry about the client, I just write a script, like this one...</p>
+<pre class="source-code"><span class="cm-variable">Add</span><span class="cm-operator">-</span><span class="cm-variable">Type</span> <span class="cm-operator">-</span><span class="cm-variable">Path</span> <span class="cm-string">"c:\trunk\AnyCPU\Debug\HP.HPTRIM.SDK.dll"</span>
+<span class="cm-variable">$database</span> <span class="cm-operator">=</span> <span class="cm-variable">New</span><span class="cm-operator">-</span><span class="cm-variable">Object</span> <span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">SDK</span>.<span class="cm-property">Database</span>
+<span class="cm-variable">$database</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"I1"</span>
+<span class="cm-variable">$database</span>.<span class="cm-property">WorkgroupServerName</span> <span class="cm-operator">=</span> <span class="cm-string">"local"</span>
+<span class="cm-variable">$database</span>.<span class="cm-property">Connect</span>()
+
+<span class="cm-variable">$recordSearch</span> <span class="cm-operator">=</span> <span class="cm-variable">New</span><span class="cm-operator">-</span><span class="cm-variable">Object</span> <span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">SDK</span>.<span class="cm-property">TrimMainObjectSearch</span>(<span class="cm-variable">$database</span>, [<span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">SDK</span>.<span class="cm-property">BaseObjectTypes</span>]::<span class="cm-variable">Record</span>)
+<span class="cm-variable">$recordSearch</span>.<span class="cm-property">SetSearchString</span>(<span class="cm-string">"all"</span>)
+
+<span class="cm-variable">foreach</span> (<span class="cm-variable">$record</span> <span class="cm-keyword">in</span> <span class="cm-variable">$recordSearch</span>) {
+    <span class="cm-variable">foreach</span> (<span class="cm-variable">$rendition</span> <span class="cm-keyword">in</span> <span class="cm-variable">$record</span>.<span class="cm-property">ChildRenditions</span>) {
+        <span class="cm-keyword">if</span> (<span class="cm-variable">$rendition</span>.<span class="cm-property">TypeOfRendition</span> <span class="cm-operator">-</span><span class="cm-variable">eq</span> [<span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">SDK</span>.<span class="cm-property">RenditionType</span>]::<span class="cm-variable">Longevity</span>) {
+            <span class="cm-variable">$extracted</span> <span class="cm-operator">=</span> <span class="cm-variable">$rendition</span>.<span class="cm-property">Extract</span>(<span class="cm-string">"c:\MyTest\" + $record.Uri + "</span><span class="cm-operator">-</span><span class="cm-string">" +$rendition.Uri + "</span>.<span class="cm-string">" +$rendition.Extension, $false)</span>
+            <span class="cm-variable">Write</span><span class="cm-operator">-</span><span class="cm-variable">Host</span> <span class="cm-string">"Extracted: "</span> <span class="cm-variable">$extracted</span>
+        }
+    }
+}
+
+<span class="cm-variable">$database</span>.<span class="cm-variable">Dispose</span>()</pre>
+<h1>Notes</h1>
+<ul>
+<li>I name the PDF file using both the Record and Rendition URI to both associate the file with the Record and also to allow for the fact that a Record may have multiple PDF renditions.</li>
+<li>I would have used the record number for the file name except that record numbers may contain slashes which would break in a file name.</li>
+<li>Your SDK path will be different to mine, most probably under Program Files instead of my Debug directory.</li>
+</ul>
+</body></html>

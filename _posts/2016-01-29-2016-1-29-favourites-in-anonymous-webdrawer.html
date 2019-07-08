@@ -1,0 +1,26 @@
+---
+layout: post
+title: Favourites in anonymous WebDrawer
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p>A common usage of WebDrawer is to allow anonymous access to part or all of an RM dataset.  How then to allow a user mark records as favourites?  One way is to store a list of record uris in the browser local storage.</p>
+<p>This sample injects a star icon into the search results and allows you to display and print a list of all your favourite records.</p>
+<h1>Video</h1>
+<iframe src="https://player.vimeo.com/video/153433423" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><p> </p>
+<h1>Code</h1>
+<p>The code is <a href="https://integrationhprm.codeplex.com/SourceControl/latest#WebDrawer%20Plugins/StarredRecords/readme.md">here</a>, if you are using RM 83 use this <a href="https://integrationhprm.codeplex.com/SourceControl/latest#WebDrawer%20Plugins/StarredRecords83/readme.md">code</a> instead.</p>
+<h1>Potential Issues</h1>
+<h2>URL Limits</h2>
+<p>IIS imposes limits on URL length, so if a user selects lots of records (I tested up to 70 without problem) they might get an error when loading the starred view.  This is fixed in the 83 sample by using a post rather than a get to open the starred view.</p>
+<h2>Locations</h2>
+<p>I have not explicitly excluded Locations, although they are excluded almost by accident due to the fact that Location search results only have one column.   If you display more than one column in tour Location search results you will see a star and this could confuse everything.  Some refinement of the code will be required.</p>
+</body></html>

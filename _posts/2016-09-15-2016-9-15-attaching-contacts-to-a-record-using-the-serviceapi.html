@@ -1,0 +1,68 @@
+---
+layout: post
+title: Attaching contacts to a Record using the ServiceAPI
+categories: []
+tags:
+- ServiceAPI
+- ".Net ServiceAPI Client"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>A further update</h1>
+<p dir="ltr">Was not thinking as clearly as I could have been last time I posted.  The best way to get the contacts is via the ChildLocations property as this will tell you the relationship type, for example:</p>
+<pre class="source-code"><span class="cm-tag">Records</span> <span class="cm-tag">request</span> = <span class="cm-tag">new</span> <span class="cm-tag">Records</span>();
+<span class="cm-tag">request</span><span class="cm-qualifier">.q</span> = <span class="cm-string">"REC_349"</span>;
+<span class="cm-tag">request</span><span class="cm-qualifier">.Properties</span> = <span class="cm-tag">new</span> <span class="cm-tag">PropertyList</span>(<span class="cm-string">"ChildLocations"</span>);
+
+<span class="cm-tag">RecordsResponse</span> <span class="cm-tag">response</span> = <span class="cm-tag">trimClient</span><span class="cm-qualifier">.Get</span>&lt;<span class="cm-tag">RecordsResponse</span>&gt;(<span class="cm-tag">request</span>);
+
+<span class="cm-tag">foreach</span> (<span class="cm-tag">var</span> <span class="cm-tag">rec</span> <span class="cm-tag">in</span> <span class="cm-tag">response</span><span class="cm-qualifier">.Results</span>)
+{
+    <span class="cm-property cm-error">foreach</span> (<span class="cm-property cm-error">var</span> <span class="cm-property cm-error">childLoc</span> <span class="cm-property cm-error">in</span> <span class="cm-property cm-error">rec</span><span class="cm-error">.ChildLocations</span>)
+    {
+        <span class="cm-property cm-error">Console</span><span class="cm-error">.WriteLine</span>(<span class="cm-string">"{0} - {1}"</span>, <span class="cm-property cm-error">childLoc</span><span class="cm-error">.Name</span>, <span class="cm-property cm-error">childLoc</span><span class="cm-error">.TypeOfContact</span>);
+    }
+}</pre>
+<h1>Update</h1>
+<p>As noted by Michelle below you cannot add a contact that already exists.  The way to find who is already a contact is to do a Location search, for example:</p>
+<pre class="source-code"><span class="cm-tag">Locations</span> <span class="cm-tag">request</span> = <span class="cm-tag">new</span> <span class="cm-tag">Locations</span>();
+<span class="cm-tag">request</span><span class="cm-qualifier">.q</span> = <span class="cm-string">"contactOf:REC_1"</span>;
+<span class="cm-tag">LocationsResponse</span> <span class="cm-tag">response</span> = <span class="cm-tag">trimClient</span><span class="cm-qualifier">.Get</span>&lt;<span class="cm-tag">LocationsResponse</span>&gt;(<span class="cm-tag">request</span>);
+<span class="cm-tag">foreach</span> (<span class="cm-tag">Location</span> <span class="cm-tag">loc</span> <span class="cm-tag">in</span> <span class="cm-tag">response</span><span class="cm-qualifier">.Results</span>)
+{
+    <span class="cm-property cm-error">Console</span><span class="cm-error">.WriteLine</span>(<span class="cm-property cm-error">loc</span><span class="cm-error">.Uri</span>);
+}</pre>
+<p> </p>
+<h1>The problem</h1>
+<p>Contacts have a slightly more complex relationship to Records than is ideal, for example they have a one to many relationship but are not represented by a child list.  You can set the 'Other' contact using Record.OtherContact but then how do you more contacts?</p>
+<p>When using the ServiceAPI look in these four places when trying to get or set data:</p>
+<ol>
+<li>the stock properties (e.g. Record.Title, Record.OtherContact),</li>
+<li>child lists (e.g. Record.ChildHolds)</li>
+<li>custom properties (e.g. Record.Html - check the documentation for which of these are read only), and</li>
+<li>service actions.</li>
+</ol>
+<h1>Service Action to set multiple contacts</h1>
+<p>Service actions are only for writing, not reading.  Reading is done via properties.  You may call the same service action multiple times in a single request and the ServiceAPI help contains a page to demonstrate the JSON for every action.  Below is the C# code to add multiple contacts to a Record.</p>
+<pre class="source-code"><span class="cm-tag">Record</span> <span class="cm-tag">rec</span> = <span class="cm-tag">new</span> <span class="cm-tag">Record</span>();
+<span class="cm-tag">rec</span><span class="cm-qualifier">.Uri</span> = <span class="cm-number">9000000001</span>;
+<span class="cm-tag">rec</span><span class="cm-qualifier">.ActionsToCall</span> = <span class="cm-tag">new</span> <span class="cm-tag">List</span>&lt;<span class="cm-tag">IMainObjectActionRequest</span>&gt;();
+
+<span class="cm-tag">rec</span><span class="cm-qualifier">.ActionsToCall</span><span class="cm-qualifier">.Add</span>( <span class="cm-tag">new</span> <span class="cm-tag">AttachContact</span>()
+{
+    <span class="cm-property cm-error">AsContactType</span> = <span class="cm-property cm-error">ContactType</span><span class="cm-error">.Addressee</span>,
+    <span class="cm-property cm-error">ContactLocation</span> = <span class="cm-property cm-error">new</span> <span class="cm-property cm-error">LocationRef</span>() { <span class="cm-property cm-error">FindBy</span> = <span class="cm-string">"Me"</span> }
+});
+
+<span class="cm-tag">rec</span><span class="cm-qualifier">.ActionsToCall</span><span class="cm-qualifier">.Add</span>(<span class="cm-tag">new</span> <span class="cm-tag">AttachContact</span>()
+{
+    <span class="cm-property cm-error">AsContactType</span> = <span class="cm-property cm-error">ContactType</span><span class="cm-error">.Other</span>,
+    <span class="cm-property cm-error">ContactLocation</span> = <span class="cm-property cm-error">new</span> <span class="cm-property cm-error">LocationRef</span>() { <span class="cm-property cm-error">Uri</span> = <span class="cm-number">9000000072</span> }
+});
+
+<span class="cm-tag">trimClient</span><span class="cm-qualifier">.Post</span>&lt;<span class="cm-tag">RecordsResponse</span>&gt;(<span class="cm-tag">rec</span>);</pre>
+</body></html>

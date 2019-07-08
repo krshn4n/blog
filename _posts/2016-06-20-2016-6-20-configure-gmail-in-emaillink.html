@@ -1,0 +1,44 @@
+---
+layout: post
+title: Configure Gmail in EmailLink
+categories: []
+tags:
+- ExchangeLink
+- EmailLink
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>With the release of HPE Content Manager 9.0 Gmail is supported in EmailLink (ExchangeLink).  Here I demonstrate how to configure this.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/171345681?wmode=opaque" width="640" height="360" frameborder="0" title="gmail_trimlink" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+ 
+<h1>Summary</h1>
+<p>In short, to set up the Google credentials:</p>
+<ol>
+<li>create a project,</li>
+<li>enable the Gmail API for the project,</li>
+<li>create a service account,</li>
+<li>create the credentials,</li>
+<li>save the P12 file, and</li>
+<li>configure the gmail scope for the service account.</li>
+</ol>
+<h1>Links</h1>
+<p>Here the links I used in this tutorial</p>
+<ul>
+<li>Google <a href="https://developers.google.com/admin-sdk/directory/v1/guides/delegation#create_the_service_account_and_its_credentials">service account documentation</a>
+</li>
+<li>Google APIs <a href="https://console.developers.google.com/apis/credentials/">credentials</a>
+</li>
+<li>Google <a href="https://admin.google.com/AdminHome">Admin Console</a>
+</li>
+</ul>
+<h1>Remember...</h1>
+<ul>
+<li>to create a P12 key when creating the credentials, </li>
+<li>there is no need to specify the User Name in the EmailLink authentication</li>
+</ul>
+</body></html>

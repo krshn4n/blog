@@ -1,0 +1,123 @@
+---
+layout: post
+title: WebClient ADFS setup for Office Integrations
+categories: []
+tags:
+- ADFS
+- Web Client
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p>To configure the Web Client to use ADFS follow the same steps as those required for <a href="/blog/2015/6/25/simple-webdrawer-adfs">WebDrawer</a>.  If in addition to using ADFS via a web browser you wish to use the Office addins with the Web Client / ServiceAPI you will need to do some additional configuration.  This is to support the OAuth authentication required by client applications.  Use the powershell command Add-ADFSClient on your ADFS server to create the ADFS client, described in this <a href="/blog/2015/9/24/adfs-authentication-from-a-client-application">post</a>.</p>
+<h1>Warning</h1>
+<p dir="ltr">Be careful with case.  Uris are case sensitive and if you get this wrong everything will be broken.</p>
+<h1>Things to look for in web.config</h1>
+<p>The location for the Integration path should allow anonymous access as the authorization is handled by a bearer token sent by the Office Addin.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">location</span> <span class="cm-attribute">path</span>=<span class="cm-string">"Integration"</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.web</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">authorization</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">allow</span> <span class="cm-attribute">users</span>=<span class="cm-string">"?"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">authorization</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.web</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">location</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<p>Also, inside the location path for "hprmserviceapi" ensure that the authorization is similarly set.</p>
+<p>Near the top of web.config is the configuration element containing configSections, this should contain the two sections below.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">section</span> 
+  <span class="cm-attribute">name</span>=<span class="cm-string">"system.identityModel"</span> 
+   <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Configuration.SystemIdentityModelSection, System.IdentityModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">section</span> 
+    <span class="cm-attribute">name</span>=<span class="cm-string">"system.identityModel.services"</span>
+    <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Services.Configuration.SystemIdentityModelServicesSection, System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"</span> <span class="cm-tag cm-bracket">/&gt;</span></pre>
+<p>The appSetting will probably contain the ida:FederationMetadataLocation property if you are authenticating with the WebCleitn using ADFS.  It is not necessary for the Outlook integration wo work.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">key</span>=<span class="cm-string">"ida:FederationMetadataLocation"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"https://adfs1.testteam.local/FederationMetadata/2007-06/FederationMetadata.xml"</span> <span class="cm-tag cm-bracket">/&gt;</span></pre>
+<p>Make sure the system.identityModel and system.identityModel.services have been added and configured, for example:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.identityModel</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">identityConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">audienceUris</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">value</span>=<span class="cm-string">"https://giri12012r2.trim.lab/HPEContentManager/"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">value</span>=<span class="cm-string">"https://giri12012r2/HPEContentManager/"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">audienceUris</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">securityTokenHandlers</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Services.Tokens.MachineKeySessionSecurityTokenHandler, System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">remove</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Tokens.SessionSecurityTokenHandler, System.IdentityModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">securityTokenHandlers</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">certificateValidation</span> <span class="cm-attribute">certificateValidationMode</span>=<span class="cm-string">"None"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-comment">&lt;!--Element below commented by: ValidatingIssuerNameRegistry.WriteToConfg on: '24/06/2016 5:12:27 AM (UTC)'. Differences were found in the Metatdata from: 'https://adfs1.testteam.local/FederationMetadata/2007-06/FederationMetadata.xml'.--&gt;</span>
+    <span class="cm-comment">&lt;!--&lt;issuerNameRegistry type="System.IdentityModel.Tokens.ValidatingIssuerNameRegistry, System.IdentityModel.Tokens.ValidatingIssuerNameRegistry"&gt;&lt;authority name="http://ADFS1.testteam.local/adfs/services/trust"&gt;&lt;keys&gt;&lt;add thumbprint="538B9CF4D293995C9406D7EA74C3F7353C5DD62A" /&gt;&lt;/keys&gt;&lt;validIssuers&gt;&lt;add name="http://ADFS1.testteam.local/adfs/services/trust" /&gt;&lt;/validIssuers&gt;&lt;/authority&gt;&lt;/issuerNameRegistry&gt;--&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">issuerNameRegistry</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Tokens.ValidatingIssuerNameRegistry, System.IdentityModel.Tokens.ValidatingIssuerNameRegistry"</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">authority</span> <span class="cm-attribute">name</span>=<span class="cm-string">"http://ADFS1.testteam.local/adfs/services/trust"</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">keys</span><span class="cm-tag cm-bracket">&gt;</span>
+          <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">thumbprint</span>=<span class="cm-string">"1247E2A79A46AD1EB71BFEA4582C0FB9465EE9BE"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">keys</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">validIssuers</span><span class="cm-tag cm-bracket">&gt;</span>
+          <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"http://ADFS1.testteam.local/adfs/services/trust"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">validIssuers</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">authority</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">issuerNameRegistry</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">identityConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.identityModel</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.identityModel.services</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">federationConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">cookieHandler</span> <span class="cm-attribute">requireSsl</span>=<span class="cm-string">"true"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">wsFederation</span> <span class="cm-attribute">passiveRedirectEnabled</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">issuer</span>=<span class="cm-string">"https://adfs1.testteam.local/adfs/ls"</span> <span class="cm-attribute">realm</span>=<span class="cm-string">"https://giri12012r2.trim.lab/HPEContentManager/"</span>  <span class="cm-attribute">requireHttps</span>=<span class="cm-string">"true"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">federationConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.identityModel.services</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<p>I discuss this in more detail when describing <a href="/blog/2015/6/25/simple-webdrawer-adfs">ADFS setup for WebDrawer</a>.  The key points to consider are:</p>
+<ul>
+<li>replace the <a href="https://msdn.microsoft.com/en-us/library/hh568654(v=vs.110).aspx">audienceUri </a>with one that is valid id for your relying party trust</li>
+<li>ensure that the authority name points to your ADFS server</li>
+<li>replace the <a href="https://msdn.microsoft.com/en-us/library/hh568665(v=vs.110).aspx">issuer and realm</a> with your ADFS server name and your realm</li>
+</ul>
+<h1>Things to look for in hprmServiceAPI.config</h1>
+<p>The &lt;setup /&gt; element has an attibute called useADFS, which would better be called showADFSLogout.  Set this to true to show logout link in the user menum as seen here.</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5774ed24d2b85754d8e4a3b8_1467280701226__img.png_" alt="">
+  
+
+<p>The authentication section gives the WebClient the information it requires to use OAuth authentication for the UI components.  The audience should match the identifier in your relying party trust and the federation endpoint is the same as that in ida:FederationMetadataLocation. </p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">authentication</span> <span class="cm-attribute">allowAnonymous</span>=<span class="cm-string">"false"</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">activeDirectory</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> 
+         <span class="cm-attribute">name</span>=<span class="cm-string">"adfs"</span> 
+         <span class="cm-attribute">audience</span>=<span class="cm-string">"https://giri12012r2.trim.lab/HPEContentManager/"</span> 
+         <span class="cm-attribute">metadataEndpoint</span>=<span class="cm-string">"https://adfs1.testteam.local/FederationMetadata/2007-06/FederationMetadata.xml"</span><span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">activeDirectory</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">authentication</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h1>ADFS\config.xml file</h1>
+<p>Within the WebClient folder you will find an ADFS folder which contains a file called config.xml.  This file stores the information your Office clients need to connect to ADFS.  It must be available via anonymous access so that it can be fetched before authenticatin has happened.  Before you will have the values required for this file you will need to have configured and ADFS client as descirbed in this <a href="/blog/2015/9/29/adfs-hp-rm-client-authentication">post</a>. The four values in this file are:</p>
+<table>
+  <thead>
+    <tr>
+<th>Element</th>
+<th>Source</th>
+</tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="200">clientAuthority</td>
+      <td>The address of your adfs instance. <br><em>Example</em><br>https://adfs1.testteam.local/adfs</td>
+    </tr>
+    
+        <tr>
+      <td width="200">clientResourceUri</td>
+      <td>The identifier of your relying party trust. <br><em>Example</em><br>https://MyServer/MyWebClient/</td>
+    </tr>
+    
+        <tr>
+      <td width="200">clientID</td>
+      <td>The guid used in the client created by Add-ADFSClient.</td>
+    </tr>
+    
+        <tr>
+      <td width="200">clientReturnUri</td>
+      <td>The RedirectUri specified when running Add-ADFSClient.</td>
+    </tr>
+  </tbody>
+</table>
+</body></html>

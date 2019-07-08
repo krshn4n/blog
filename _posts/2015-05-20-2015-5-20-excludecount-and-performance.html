@@ -1,0 +1,36 @@
+---
+layout: post
+title: ExcludeCount and performance
+categories: []
+tags:
+- WebDrawer
+- ServiceAPI
+- Performance
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Background</h1>
+<p>I am doing some load testing on an HPRM dataset containing 16 million records.  Response times from our web clients were not great, depending on which search query I used of course.  I really wanted to improve this.</p>
+<h1>ExcludeCount</h1>
+<p>A ServiceAPI parameter not often mentioned is ExcludeCount (otherwise known as resultsOnly).  This has the effect of committing the SearchTitle and TotalResults properties from the response.  Total results in particular can degrade performance on a large dataset as it calculates the total number of records matched by the query.</p>
+<h1>ServiceAPI Example</h1>
+<pre class="source-code">http://[myserver]/HPRMServiceAPI/Record?q=uri:2013778,1208882,1380177,1542060,1378119<span class="cm-error">&amp;format</span>=json<span class="cm-error">&amp;Excludecount</span>=true</pre>
+<h1>WebDrawer Example</h1>
+<p>Setting ExcludeCount as the default in WebDrawer will result in the search results page no longer displaying the search title.  To do this add the 'resultsOnly' attribute in the Record route defaults, as seen below.  Ensure you set this on the route named Record with the model named Records.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> 
+     <span class="cm-attribute">name</span>=<span class="cm-string">"Record"</span> 
+     <span class="cm-attribute">model</span>=<span class="cm-string">"Records"</span> 
+     <span class="cm-attribute">template</span>=<span class="cm-string">"WDRecordList"</span>
+     <span class="cm-attribute">properties</span>=<span class="cm-string">"RecordRecordType,RecordExtension,RecordTitle,RecordNumber"</span> 
+     <span class="cm-attribute">pageSize</span>=<span class="cm-string">"15"</span> 
+     <span class="cm-attribute">resultsOnly</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></pre>
+<h1>The outcome</h1>
+<p>On my large dataset ExcludeCount more than halved the response time on many requests.</p>
+<h1>The Cost</h1>
+<p>In WebDrawer the cost is that the page number links no longer work.  This <a href="/blog/2015/5/21/simplified-paging">post</a> examines a solution to the broken paging problem.</p>
+</body></html>

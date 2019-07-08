@@ -1,0 +1,32 @@
+---
+layout: post
+title: A first event processor add-in
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Event processor add-in?</h1>
+<p>The HPRM workgroup server processes a variety of scheduled events, such as word indexing and notifications.  It is possible for you to create your own custom add-ins to be triggered by one of the many record (or other object) events. I have written an <a href="/blog/2015/6/18/my-first-hprm-sdk-application">intro to HPRM SDK programming</a> in a previous post.</p>
+<h1>Getting started</h1>
+<p>This is a video of me creating a simple event processor add-in.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/134387861?wmode=opaque&amp;api=1" width="640" height="360" frameborder="0" title="Event Processor Addin Example" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+ 
+<h1>Basic debugging tips</h1>
+<p>It can be difficult to work out why a program like an event processor add-in is not working.  These are some of the strategies I use:</p>
+<ul>
+<li>write log entries from your code to verify where (or whether) your code us running,</li>
+<li>use the debugger to verify that you are at least getting to the first line of your code,</li>
+<li>start again, write the simplest possible add-in (like the one above) and bit by bit build your code up again until you work out where it is going wrong,</li>
+<li>double check you are using the correct version of the HPRM SDK, and</li>
+<li>don't forget to use the 'Test' button in HPRM Enterprise studio.</li>
+</ul>
+<p>If you have any other tips please put them in the comments below.</p>
+</body></html>

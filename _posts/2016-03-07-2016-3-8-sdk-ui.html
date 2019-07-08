@@ -1,0 +1,45 @@
+---
+layout: post
+title: SDK UI
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p>Some time ago there was a rationalisation of the UI components offered in the RM .Net SDK, the result of which is that some options that were available in the COM SDK are no longer to be found.  For example the ability to view an electronic document via  Record.ViewUI no longer exists.</p>
+<h1>What can you do?</h1>
+<p>As of RM 8.1 the following UI classes exist in the .Net SDK:</p>
+<ul>
+<li>ObjectSelector,</li>
+<li>PropertyEditor, and</li>
+<li>DesktopHelper</li>
+</ul>
+<h1>Some Code</h1>
+<p>The following extracts come form this very <a href="https://github.com/HPECM/Community/tree/master/Samples/SDK/CSharp/TrimUI">simple sample project</a>.</p>
+<h3>Edit Record Properties</h3>
+<pre class="source-code"><span class="cm-tag">Record</span> <span class="cm-tag">record</span> = <span class="cm-tag">new</span> <span class="cm-tag">Record</span>(<span class="cm-tag">_database</span>, <span class="cm-number">9000000000</span>);
+<span class="cm-tag">if</span> (<span class="cm-tag">HP</span><span class="cm-qualifier">.HPTRIM</span><span class="cm-qualifier">.SDK</span><span class="cm-qualifier">.PropertyEditor</span><span class="cm-qualifier">.EditModal</span>(<span class="cm-tag">GetDesktopWindow</span>(), <span class="cm-tag">record</span>))
+{
+    <span class="cm-property cm-error">record</span><span class="cm-error">.Save</span>();
+}</pre>
+<h3>Select Records</h3>
+<pre class="source-code"><span class="cm-tag">TrimMainObjectSearch</span> <span class="cm-tag">search</span> = <span class="cm-tag">new</span> <span class="cm-tag">TrimMainObjectSearch</span>(<span class="cm-tag">_database</span>, <span class="cm-tag">BaseObjectTypes</span><span class="cm-qualifier">.Record</span>);
+<span class="cm-tag">search</span><span class="cm-qualifier">.SelectAll</span>();
+
+<span class="cm-tag">TrimMainObjectSearch</span> <span class="cm-tag">selectedSearch</span> = <span class="cm-tag">ObjectSelector</span><span class="cm-qualifier">.SelectMany</span>(<span class="cm-tag">GetDesktopWindow</span>(), <span class="cm-tag">search</span>);</pre>
+<h3>Select Database</h3>
+<pre class="source-code"><span class="cm-tag">DesktopHelper</span> <span class="cm-tag">helper</span> = <span class="cm-tag">new</span> <span class="cm-tag">DesktopHelper</span>();
+<span class="cm-tag">Database</span> <span class="cm-tag">newDatabase</span> = <span class="cm-tag">helper</span><span class="cm-qualifier">.SelectDatabase</span>(<span class="cm-tag">GetDesktopWindow</span>(), <span class="cm-tag">false</span>, <span class="cm-tag">false</span>);
+
+<span class="cm-tag">if</span> (<span class="cm-tag">newDatabase</span> <span class="cm-keyword">!</span>= <span class="cm-tag">null</span>)
+{
+    <span class="cm-property cm-error">_database</span><span class="cm-error">.Dispose</span>();
+    <span class="cm-property cm-error">_database</span> = <span class="cm-property cm-error">newDatabase</span>;
+}</pre>
+</body></html>

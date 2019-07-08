@@ -1,0 +1,37 @@
+---
+layout: post
+title: WebDrawer - Hide And/Or button in search form
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>When you create a search form you may choose to only give it one field, in which case the And/Or button is redundant (see below).</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5886c603cd0f68bd9aecf3fe_1485227535364__img.png_" alt="">
+  
+
+<p>The cleanest way to hide this button is to edit the razor template that produces the form.  One simple change is required, first open Views\Search.cshtml (in 8.2 Views\FormSearch.cshtml) and then:</p>
+<p>Find the HTML that looks like this:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">label</span> <span class="cm-attribute">class</span>=<span class="cm-string">"radio inline"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">type</span>=<span class="cm-string">"radio"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"BooleanOperator"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"and"</span> <span class="cm-tag cm-bracket">/&gt;</span>And
+ <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">label</span> <span class="cm-attribute">class</span>=<span class="cm-string">"radio inline"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">type</span>=<span class="cm-string">"radio"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"BooleanOperator"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"or"</span> <span class="cm-attribute">checked</span> <span class="cm-tag cm-bracket">/&gt;</span>Or
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<p>And wrap it in an IF statement like this:</p>
+<pre class="source-code">@if (searchForm.DefinitionForm.Pages.SelectMany(x =&gt; x.PageItems).Count() &gt; 1)
+{
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">label</span> <span class="cm-attribute">class</span>=<span class="cm-string">"radio inline"</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">type</span>=<span class="cm-string">"radio"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"BooleanOperator"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"and"</span> <span class="cm-tag cm-bracket">/&gt;</span>And
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">label</span> <span class="cm-attribute">class</span>=<span class="cm-string">"radio inline"</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">type</span>=<span class="cm-string">"radio"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"BooleanOperator"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"or"</span> <span class="cm-attribute">checked</span> <span class="cm-tag cm-bracket">/&gt;</span>Or
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>
+}</pre>
+</body></html>

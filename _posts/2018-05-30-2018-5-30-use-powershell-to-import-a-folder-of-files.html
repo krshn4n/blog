@@ -1,0 +1,56 @@
+---
+layout: post
+title: Use Powershell to import a folder of files
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>There are a variety of ways to import files to Content Manager.  If you want granular control you may choose to write some code.  This Powershell script uses a CheckinStyle to import all EML files from a folder.</p>
+<pre class="source-code"><span class="cm-variable">Add</span><span class="cm-operator">-</span><span class="cm-variable">Type</span> <span class="cm-operator">-</span><span class="cm-variable">Path</span> <span class="cm-string">"c:\[CM Binary Path]\HP.HPTRIM.SDK.dll"</span>
+<span class="cm-variable">$database</span> <span class="cm-operator">=</span> <span class="cm-variable">New</span><span class="cm-operator">-</span><span class="cm-variable">Object</span> <span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">SDK</span>.<span class="cm-property">Database</span>
+<span class="cm-variable">$database</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"L1"</span>
+<span class="cm-variable">$database</span>.<span class="cm-property">WorkgroupServerName</span> <span class="cm-operator">=</span> <span class="cm-string">"local"</span>
+<span class="cm-variable">$database</span>.<span class="cm-property">Connect</span>()
+
+<span class="cm-variable">$checkinStyle</span> <span class="cm-operator">=</span> <span class="cm-variable">New</span><span class="cm-operator">-</span><span class="cm-variable">Object</span> <span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">SDK</span>.<span class="cm-property">CheckinStyle</span>(<span class="cm-variable">$database</span>, <span class="cm-string">"test sec"</span>);
+
+<span class="cm-variable">$files</span> <span class="cm-operator">=</span> [<span class="cm-variable">System</span>.<span class="cm-property">IO</span>.<span class="cm-property">Directory</span>]::<span class="cm-variable">GetFiles</span>(<span class="cm-string">"c:\\junk\\testimport"</span>, <span class="cm-string">"*.eml"</span>, [<span class="cm-variable">System</span>.<span class="cm-property">IO</span>.<span class="cm-property">SearchOption</span>]::<span class="cm-variable">TopDirectoryOnly</span>);
+
+<span class="cm-variable">foreach</span> (<span class="cm-variable">$file</span> <span class="cm-keyword">in</span> <span class="cm-variable">$files</span>)
+{
+<span class="cm-variable">Try</span>
+{
+    <span class="cm-variable">$inputDoc</span> <span class="cm-operator">=</span> <span class="cm-variable">New</span><span class="cm-operator">-</span><span class="cm-variable">Object</span> <span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">SDK</span>.<span class="cm-property">InputDocument</span>(<span class="cm-variable">$file</span>);
+    <span class="cm-variable">$rec</span> <span class="cm-operator">=</span> <span class="cm-variable">$checkinStyle</span>.<span class="cm-property">SetupNewRecord</span>(<span class="cm-variable">$inputDoc</span>)
+    <span class="cm-variable">$rec</span>.<span class="cm-property">Save</span>()
+
+    [<span class="cm-variable">System</span>.<span class="cm-property">IO</span>.<span class="cm-property">File</span>]::<span class="cm-variable">Move</span>(<span class="cm-variable">$file</span>, [<span class="cm-variable">System</span>.<span class="cm-property">IO</span>.<span class="cm-property">Path</span>]::<span class="cm-variable">Combine</span>(<span class="cm-string">"c:\\junk\\imported\\"</span>, [<span class="cm-variable">System</span>.<span class="cm-variable">IO</span>.<span class="cm-variable">Path</span>]::<span class="cm-variable">GetFileName</span>(<span class="cm-variable">$file</span>)))
+
+    <span class="cm-variable">Write</span><span class="cm-operator">-</span><span class="cm-variable">Host</span> <span class="cm-string">"Imported: "</span> <span class="cm-variable">$rec</span>.<span class="cm-property">Title</span> <span class="cm-operator">+</span> <span class="cm-string">" / "</span> <span class="cm-operator">+</span> <span class="cm-variable">$rec</span>.<span class="cm-property">Uri</span>
+    }
+    <span class="cm-variable">Catch</span> 
+    {
+        <span class="cm-variable">$ErrorMessage</span> <span class="cm-operator">=</span> <span class="cm-variable">$_</span>.<span class="cm-property">Exception</span>.<span class="cm-property">Message</span>
+        <span class="cm-variable">Write</span><span class="cm-operator">-</span><span class="cm-variable">Host</span> <span class="cm-string">"Error: "</span> <span class="cm-variable">$ErrorMessage</span> <span class="cm-operator">+</span> <span class="cm-string">" / "</span> <span class="cm-operator">+</span> <span class="cm-variable">$file</span>
+
+    }
+}
+
+<span class="cm-variable">$database</span>.<span class="cm-property">Dispose</span>()</pre>
+<p>To use this script:</p>
+<ul dir="ltr">
+<li>set the location of your Content Manager binaries in the first line,</li>
+<li>use your database Id in the $database,</li>
+<li>if your work-group server is not on the local machine set the WorkGroupServerName,</li>
+<li>replace the name in the Checkin Style  Style constructor,</li>
+<li>if you want to import files other than EML change the '*.eml' to something else,</li>
+<li>set the source folder name, also the destination folder in the Move method (ensure this destination folder exists), then</li>
+<li>run the script from Powershell.</li>
+</ul>
+</body></html>

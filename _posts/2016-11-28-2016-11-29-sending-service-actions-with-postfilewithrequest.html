@@ -1,0 +1,47 @@
+---
+layout: post
+title: Sending service actions with PostFileWithRequest
+categories: []
+tags:
+- ServiceAPI
+- ".Net ServiceAPI Client"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>The PostFileWithRequest operates differently to the normal Post request in that instead of sending a simple JSON object it sends a multi-part form request with the object (e.g. a Record) serialized not to JSON but as an HTML form.  This means that some complex constructs, such as the Record.AccessControlList, do not translate well.</p>
+<h1> </h1>
+<p>Service Actions, sent in ActionsToCall, nearly work except for the code that specifies the type of Service Action.  The good news is that this can be tweaked on the client side by overriding the code to emit the type name.  In the sample below the line JsConfig.TypeWriter... called after TrimClient is instantiated, should allow any Service Action to be de-serialized by the ServiceAPI.</p>
+<pre class="source-code"><span class="cm-tag">TrimClient</span> <span class="cm-tag">trimClient</span> = <span class="cm-tag">new</span> <span class="cm-tag">TrimClient</span>(<span class="cm-string">"http://MyServer/ServiceAPI"</span>);
+<span class="cm-tag">trimClient</span><span class="cm-qualifier">.AlwaysSendBasicAuthHeader</span> = <span class="cm-tag">true</span>;
+<span class="cm-tag">trimClient</span><span class="cm-qualifier">.UserName</span> = <span class="cm-string">"USERNAME"</span>;
+<span class="cm-tag">trimClient</span><span class="cm-qualifier">.Password</span> = <span class="cm-string">"PASSWORD"</span>;
+
+<span class="cm-tag">JsConfig</span><span class="cm-qualifier">.TypeWriter</span> = (<span class="cm-tag">tt</span>) =&gt; {
+    <span class="cm-property cm-error">return</span> <span class="cm-property cm-error">string</span><span class="cm-error">.Format</span>(<span class="cm-string">"{0}.{1}"</span>, <span class="cm-property cm-error">tt</span><span class="cm-error">.Namespace</span>, <span class="cm-property cm-error">tt</span><span class="cm-error">.Name</span>);
+};
+            
+<span class="cm-tag">Record</span> <span class="cm-tag">rec</span> = <span class="cm-tag">new</span> <span class="cm-tag">Record</span>();
+<span class="cm-tag">rec</span><span class="cm-qualifier">.RecordType</span> = <span class="cm-tag">new</span> <span class="cm-tag">RecordTypeRef</span>() { <span class="cm-property cm-error">FindBy</span> = <span class="cm-string">"Document"</span> };
+<span class="cm-tag">rec</span><span class="cm-qualifier">.Title</span> = <span class="cm-string">"test"</span>;
+<span class="cm-tag">rec</span><span class="cm-qualifier">.ActionsToCall</span> = <span class="cm-tag">new</span> <span class="cm-tag">List</span>&lt;<span class="cm-tag">IMainObjectActionRequest</span>&gt;();
+
+<span class="cm-tag">rec</span><span class="cm-qualifier">.ActionsToCall</span><span class="cm-qualifier">.Add</span>(<span class="cm-tag">new</span> <span class="cm-tag">AttachContact</span>()
+{
+    <span class="cm-property cm-error">AsContactType</span> = <span class="cm-property cm-error">ContactType</span><span class="cm-error">.Addressee</span>,
+    <span class="cm-property cm-error">ContactLocation</span> = <span class="cm-property cm-error">new</span> <span class="cm-property cm-error">LocationRef</span>() { <span class="cm-property cm-error">FindBy</span> = <span class="cm-string">"Me"</span> }
+});
+
+<span class="cm-tag">rec</span><span class="cm-qualifier">.ActionsToCall</span><span class="cm-qualifier">.Add</span>(<span class="cm-tag">new</span> <span class="cm-tag">AttachContact</span>()
+{
+    <span class="cm-property cm-error">AsContactType</span> = <span class="cm-property cm-error">ContactType</span><span class="cm-error">.Other</span>,
+    <span class="cm-property cm-error">ContactLocation</span> = <span class="cm-property cm-error">new</span> <span class="cm-property cm-error">LocationRef</span>() { <span class="cm-property cm-error">Uri</span> = <span class="cm-number">9000000072</span> }
+});
+
+<span class="cm-tag">FileInfo</span> <span class="cm-tag">fi</span> = <span class="cm-tag">new</span> <span class="cm-tag">FileInfo</span>(<span class="cm-string">"c:\\junk\\Test.txt"</span>);
+
+<span class="cm-tag">var</span> <span class="cm-tag">response</span> = <span class="cm-tag">trimClient</span><span class="cm-qualifier">.PostFileWithRequest</span>&lt;<span class="cm-tag">RecordsResponse</span>&gt;(<span class="cm-tag">fi</span>, <span class="cm-tag">rec</span>);</pre>
+</body></html>

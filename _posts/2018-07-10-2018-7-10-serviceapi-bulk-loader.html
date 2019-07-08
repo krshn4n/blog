@@ -1,0 +1,57 @@
+---
+layout: post
+title: ServiceAPI Bulk Loader
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>The ServiceAPI exposes a bulk loading capabilities for which a C# sample is provided in the help.  This blog post shows the actual JSON that is sent over the wire.</p>
+<p>The first step is to create an Origin object in the client, once this is done a batch of Records can be posted to the bulk loader.  The sample below:</p>
+<ul>
+<li>uses the Origin with Uri 9000000006,</li>
+<li>does not use background processing (processing is completed within the HTTP post request),</li>
+<li>creates one Location and one Record,</li>
+<li>uses the Location created for the Record assignee,</li>
+<li>assumes that the file "test doc.docx" has already been uploaded (using the UploadFile service), and</li>
+<li>should be posted to http://MyServer/ServiceAPI/BulkLoader.</li>
+</ul>
+<pre class="source-code">{
+    <span class="cm-string">"Origin"</span>: {
+        <span class="cm-string">"Uri"</span>:<span class="cm-number">9000000006</span>
+    },
+    <span class="cm-string">"AutoCommitLocations"</span>: <span class="cm-atom">true</span>,
+    <span class="cm-string">"SQLCheckConstraints"</span>: <span class="cm-atom">false</span>,
+    <span class="cm-string">"SQLServerTableLock"</span>: <span class="cm-atom">true</span>,
+    <span class="cm-string">"UseBulkLoaderRecordNumbering"</span>: <span class="cm-atom">true</span>,
+    <span class="cm-string">"ProcessInBackground"</span>:<span class="cm-atom">true</span>,
+    <span class="cm-string">"LocationsToImport"</span>:[{
+        <span class="cm-string cm-property">"LocationSurname"</span>:<span class="cm-string">"Jones"</span>, 
+        <span class="cm-string cm-property">"LocationGivenNames"</span>:<span class="cm-string">"Arthur"</span>,
+        <span class="cm-string cm-property">"LocationTypeOfLocation"</span>:<span class="cm-string">"Person"</span>
+    }],
+    <span class="cm-string">"RecordsToImport"</span>: [
+        {
+            <span class="cm-string cm-property">"RecordTitle"</span>: <span class="cm-string">"My title from BL 5.1 AAAAA"</span>,
+            <span class="cm-string cm-property">"RecordAssignee"</span>:{
+                <span class="cm-string cm-property">"LocationSurname"</span>:<span class="cm-string">"Jones"</span>, 
+                <span class="cm-string cm-property">"LocationGivenNames"</span>:<span class="cm-string">"Arthur"</span>
+            },
+            <span class="cm-string cm-property">"RecordFilePath"</span>:<span class="cm-string">"test doc.docx"</span>
+        }
+    ]
+}
+</pre>
+<h1>Background processing</h1>
+<p dir="ltr">If 'ProcessInBackground' is set to true then the ServiceAPI will hand the bulk loading request off to the TRIMServiceAPIBulkLoader service (installed as a windows service).  In this case the bulk loading request will immediately return an OriginHistory object.  The Uri from this object can be used to poll the OriginHistory object to find out when the bulk loading operation has completed.  The Url to fetch the OriginHistory will look like this:</p>
+<pre class="source-code"><span class="cm-variable">http</span>:<span class="cm-comment">//localhost/ServiceAPI/OriginHistory?q=uri:9000000019&amp;properties=BulkLoaderIsRunning,OriginHistoryRecordsCreated</span></pre>
+<h1>Demo</h1>
+<p dir="ltr">In the video below I demonstrate bulk loading one Record using background processing.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/279175060?app_id=122963&amp;wmode=opaque" width="576" height="360" frameborder="0" title="bulk_loader" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+</body></html>

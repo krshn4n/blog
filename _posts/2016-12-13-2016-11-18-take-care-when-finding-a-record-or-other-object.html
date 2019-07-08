@@ -1,0 +1,36 @@
+---
+layout: post
+title: Take care when 'finding' a Record by number
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>In a recent <a href="/blog/2016/10/6/optimise-a-serviceapi-post-with-findby">post </a>I discussed the FindBy method.  This can significantly reduce the load on a server by eliminating unnecessary requests.  When searching for a record by record number, it is faster to find than to search.</p>
+<h1>Search Examples</h1>
+<p>This is faster:</p>
+<pre class="source-code">/Record/rec_1?format=json</pre>
+<p>Than this:</p>
+<pre class="source-code">/Record?q=number:rec_1<span class="cm-error">&amp;format</span>=json</pre>
+<h1>FindBy Examples</h1>
+<p>This is faster:</p>
+<pre class="source-code">{
+    "RecordTitle": "My Title",
+    "RecordContainer": {"FindBy":"REC_1"}
+}</pre>
+<p>Than this:</p>
+<pre class="source-code">{
+    "RecordTitle": "My Title",
+    "RecordContainer": {"FindBy":"number:REC_1"}
+}</pre>
+<h1>Caveats</h1>
+<p dir="ltr">Firstly, if you have numeric record numbers they may clash with the record Uri so you will have to do a search and use the 'number' clause.</p>
+<p dir="ltr">Omitting the 'number' clause from a FindBy causes the 'default' search to be used which also includes the title, this may result in false positives.</p>
+<h1 dir="ltr">Summary</h1>
+<p dir="ltr">On systems under heavy load you may consider avoiding the number clause as long as you write your code to filter out any false positive search results that result from doing so.</p>
+</body></html>

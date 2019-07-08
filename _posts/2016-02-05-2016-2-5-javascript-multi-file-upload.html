@@ -1,0 +1,35 @@
+---
+layout: post
+title: Javascript multi file upload
+categories: []
+tags:
+- WebDrawer
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p>There are a number of ways to do a multi file upload, this is a simple one that has these features:</p>
+<ul>
+<li>each file uploaded in a seperate request,</li>
+<li>checks file size before upload, and</li>
+<li>update RecordDateCreated with file last modified date.</li>
+</ul>
+<h1>Tutorial</h1>
+<iframe src="https://player.vimeo.com/video/154274619" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><h1>The setup</h1>
+<p>In hptrim.config:</p>
+<ul>
+<li>add Json to serviceFeatures</li>
+<li>add the following route (in routeDefaults)</li>
+</ul>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span>
+   <span class="cm-attribute">name</span>=<span class="cm-string">"Record"</span>
+   <span class="cm-attribute">model</span>=<span class="cm-string">"Record"</span> 
+<span class="cm-tag cm-bracket">/&gt;</span></pre>
+<h1>The code</h1>
+<p>Copy this <a href="https://integrationhprm.codeplex.com/SourceControl/latest#WebDrawer%20Plugins/BulkUpload/BulkUpload.cshtml">file</a> to your WebDrawer root file (or a subfolder if you wish).</p>
+</body></html>

@@ -1,0 +1,109 @@
+---
+layout: post
+title: Download a child document using the .Net client
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Background</h1>
+<p>Today I fielded a request for help downloading a Record Revision using the ServiceAPI .Net client.  Thinking this should be simple I prepared the sample code below, only to find it failed.  Similar sample code works when downloading a document.  Turns out we have a bug.</p>
+<pre class="source-code"><span class="cm-variable">ChildDownload</span> <span class="cm-variable">request</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">ChildDownload</span>();
+<span class="cm-variable">request</span>.<span class="cm-property">ChildUri</span> <span class="cm-operator">=</span> <span class="cm-number">12</span>;
+<span class="cm-variable">request</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"1843"</span>;
+<span class="cm-variable">request</span>.<span class="cm-property">TrimType</span> <span class="cm-operator">=</span> <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-property">Record</span>;
+<span class="cm-variable">request</span>.<span class="cm-property">TrimChildType</span> <span class="cm-operator">=</span> <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-property">RecordRevision</span>;
+
+<span class="cm-variable">trimClient</span>.<span class="cm-property">GetDocument</span>(<span class="cm-variable">request</span>, @<span class="cm-string">"d:\junk"</span>);</pre>
+<h1>The problem</h1>
+<p>Inside the GetDocument method there is a routine to work out the name of the document from the <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html">content disposition</a>, unfortunately the child documents have a differently format content disposition to the standard document download and our code to parse the content disposition to extract the file name was failing.  So the document gets downloaded but never saved to disk.</p>
+<h1>Content-Disposition</h1>
+<p>The purpose of the content disposition header is to suggest a file name for the file we are downloading.  When fetching a document (e.g. http://MyServer/HPRMServiceAPI/Record/1843/File/Document) the content disposition sent by the ServiceAPI looks like this:</p>
+<pre class="source-code"><span class="cm-variable">Content</span><span class="cm-operator">-</span><span class="cm-variable">Disposition</span>: <span class="cm-variable">attachment</span>; <span class="cm-variable">filename</span><span class="cm-operator">=</span><span class="cm-string">"test.XML"</span></pre>
+<p><strong>Update</strong>: The URL to download a child document in recent versions of the ServiceAPI is different to the one below, it look like this:</p>
+<pre class="source-code">http://MyServer/ServiceAPI/record/9000000001/children/recordrevision/9000000001</pre>
+<p>The ServiceAPI uses a slightly different mechanism for downloading a child document (e.g. http://MyServer/HPRMServiceAPI/Record/1843/RecordRevision/12).  And the content disposition sent looks different, like this: </p>
+<pre class="source-code"><span class="cm-variable">Content</span><span class="cm-operator">-</span><span class="cm-variable">Disposition</span>: <span class="cm-variable">attachment</span>; <span class="cm-variable">filename</span><span class="cm-operator">=</span><span class="cm-string">"0F3P09LF001.PDF"</span>; <span class="cm-variable">size</span><span class="cm-operator">=</span><span class="cm-number">3881</span>; <span class="cm-variable">creation</span><span class="cm-operator">-</span><span class="cm-variable">date</span><span class="cm-operator">=</span><span class="cm-variable">Wed</span> <span class="cm-number">27</span> <span class="cm-variable">May</span> <span class="cm-number">2015</span> <span class="cm-number">00</span>:<span class="cm-number">38</span>:<span class="cm-number">08</span> <span class="cm-variable">GMT</span>; <span class="cm-variable">modification</span><span class="cm-operator">-</span><span class="cm-variable">date</span><span class="cm-operator">=</span><span class="cm-variable">Thu</span> <span class="cm-number">28</span> <span class="cm-variable">May</span> <span class="cm-number">2015</span> <span class="cm-number">09</span>:<span class="cm-number">45</span>:<span class="cm-number">43</span> <span class="cm-variable">GMT</span>; <span class="cm-variable">read</span><span class="cm-operator">-</span><span class="cm-variable">date</span><span class="cm-operator">=</span><span class="cm-variable">Wed</span> <span class="cm-number">27</span> <span class="cm-variable">May</span> <span class="cm-number">2015</span> <span class="cm-number">00</span>:<span class="cm-number">38</span>:<span class="cm-number">08</span> <span class="cm-variable">GMT</span>
+</pre>
+<h1>The solution</h1>
+<p>I could write a bespoke file download using the .Net WebClient but I can also patch the TrimClient to add a working child download method.  I chose to do the latter.  Below is a C# extension which adds the method MyGetChildDocument to TrimClient.  If the content disposition parser fails it tries to extract using a regular expression, it that fails it uses a fallback name as passed in the method parameters.</p>
+<pre class="source-code"><span class="cm-variable">public</span> <span class="cm-variable">static</span> <span class="cm-keyword">class</span> <span class="cm-variable">ClientExtensions</span>
+{
+    <span class="cm-property">public</span> <span class="cm-variable">static</span> <span class="cm-variable">string</span> <span class="cm-variable">MyGetChildDocument</span>(
+        <span class="cm-keyword">this</span> <span class="cm-variable">TrimClient</span> <span class="cm-variable">trimClient</span>, 
+        <span class="cm-variable">ChildDownload</span> <span class="cm-variable">request</span>, 
+        <span class="cm-variable">string</span> <span class="cm-variable">fileDownloadPath</span>, <span class="cm-variable">string</span> <span class="cm-variable">fallbackName</span> <span class="cm-operator">=</span> <span class="cm-string">"temp.tmp"</span>)
+    {
+        <span class="cm-keyword">if</span> (<span class="cm-variable">string</span>.<span class="cm-property">IsNullOrEmpty</span>(<span class="cm-variable">fileDownloadPath</span>))
+        {
+            <span class="cm-variable">fileDownloadPath</span> <span class="cm-operator">=</span> <span class="cm-variable">Environment</span>.<span class="cm-property">CurrentDirectory</span>;
+        }
+
+        <span class="cm-variable">string</span> <span class="cm-variable">docPath</span> <span class="cm-operator">=</span> <span class="cm-atom">null</span>;
+        <span class="cm-variable">trimClient</span>.<span class="cm-property">ServiceClient</span>.<span class="cm-property">LocalHttpWebResponseFilter</span> <span class="cm-operator">=</span> (<span class="cm-def">response</span>) <span class="cm-operator">=&gt;</span>
+        {
+            <span class="cm-variable">string</span> <span class="cm-variable">fileName</span> <span class="cm-operator">=</span> <span class="cm-atom">null</span>;
+            <span class="cm-variable">string</span> <span class="cm-variable">contentDispHeader</span>
+                <span class="cm-operator">=</span> <span class="cm-variable-2">response</span>.<span class="cm-property">GetResponseHeader</span>(<span class="cm-string">"Content-Disposition"</span>);
+
+            <span class="cm-keyword">if</span> (<span class="cm-operator">!</span><span class="cm-variable">string</span>.<span class="cm-property">IsNullOrEmpty</span>(<span class="cm-variable">contentDispHeader</span>))
+            {
+
+                <span class="cm-keyword">try</span>
+                {
+                    <span class="cm-variable">ContentDisposition</span> <span class="cm-variable">contentDisp</span>
+                        <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">ContentDisposition</span>(<span class="cm-variable">contentDispHeader</span>);
+                    <span class="cm-variable">fileName</span> <span class="cm-operator">=</span> <span class="cm-variable">contentDisp</span>.<span class="cm-property">FileName</span>;
+                }
+                <span class="cm-keyword">catch</span>
+                {
+                    <span class="cm-comment">// content disposition must not match what the ContentDisposition object expects</span>
+                }
+
+                <span class="cm-keyword">if</span> (<span class="cm-def">fileName</span> <span class="cm-operator">==</span> <span class="cm-atom">null</span>)
+                {
+                    <span class="cm-variable">Match</span> <span class="cm-variable">match</span>
+                        <span class="cm-operator">=</span> <span class="cm-variable">Regex</span>.<span class="cm-property">Match</span>(<span class="cm-variable">contentDispHeader</span>, <span class="cm-string">"filename=\"([^)]*)\""</span>);
+
+                    <span class="cm-keyword">if</span> (<span class="cm-variable">match</span>.<span class="cm-property">Success</span>)
+                    {
+                        <span class="cm-variable-2">fileName</span> <span class="cm-operator">=</span> <span class="cm-variable">match</span>.<span class="cm-property">Groups</span>[<span class="cm-number">1</span>].<span class="cm-property">Value</span>;
+                    }
+                }
+
+            }
+
+            <span class="cm-keyword">if</span> (<span class="cm-variable">fileName</span> <span class="cm-operator">==</span> <span class="cm-atom">null</span>)
+            {
+                <span class="cm-variable">fileName</span> <span class="cm-operator">=</span> <span class="cm-variable">fallbackName</span>;
+            }
+
+            <span class="cm-variable">docPath</span> <span class="cm-operator">=</span> <span class="cm-variable">Path</span>.<span class="cm-property">Combine</span>(<span class="cm-variable">fileDownloadPath</span>, <span class="cm-variable">fileName</span>);
+            <span class="cm-variable">using</span> (<span class="cm-variable">FileStream</span> <span class="cm-variable">fs</span>
+                <span class="cm-operator">=</span> <span class="cm-variable">File</span>.<span class="cm-variable">Open</span>(<span class="cm-variable">docPath</span>, <span class="cm-variable">FileMode</span>.<span class="cm-variable">Create</span>, <span class="cm-variable">FileAccess</span>.<span class="cm-variable">Write</span>))
+            {
+                <span class="cm-variable-2">response</span>.<span class="cm-property">GetResponseStream</span>().<span class="cm-property">CopyTo</span>(<span class="cm-variable">fs</span>);
+                <span class="cm-variable">fs</span>.<span class="cm-property">Close</span>();
+            }
+        };
+
+        <span class="cm-variable">trimClient</span>.<span class="cm-property">ServiceClient</span>.<span class="cm-property">Get</span>(<span class="cm-variable">request</span>);
+        <span class="cm-keyword">return</span> <span class="cm-variable">docPath</span>;
+    }
+}</pre>
+<h1>Implementing</h1>
+<p>The full extension can be downloaded <a href="/s/ClientExtensions.zip">here</a>, simply include it in your project, change its namespace and then make a call like this:</p>
+<pre class="source-code"><span class="cm-variable">ChildDownload</span> <span class="cm-variable">request</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">ChildDownload</span>();
+<span class="cm-variable">request</span>.<span class="cm-property">ChildUri</span> <span class="cm-operator">=</span> <span class="cm-number">12</span>;
+<span class="cm-variable">request</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"1843"</span>;
+<span class="cm-variable">request</span>.<span class="cm-property">TrimType</span> <span class="cm-operator">=</span> <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-property">Record</span>;
+<span class="cm-variable">request</span>.<span class="cm-property">TrimChildType</span> <span class="cm-operator">=</span> <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-property">RecordRevision</span>;
+
+<span class="cm-variable">string</span> <span class="cm-variable">filePath</span> <span class="cm-operator">=</span> <span class="cm-variable">trimClient</span>.<span class="cm-property">MyGetChildDocument</span>(<span class="cm-variable">request</span>, @<span class="cm-string">"d:\junk"</span>);</pre>
+</body></html>

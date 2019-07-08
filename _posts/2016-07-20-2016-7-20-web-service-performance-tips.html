@@ -1,0 +1,37 @@
+---
+layout: post
+title: Web Service performance tips
+categories: []
+tags:
+- service
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>Whether you are using the ServiceAPI or your own web service built on the .Net SDK there a re a couple of things you can do to improve performance.</p>
+<h1>Object Cache</h1>
+<p>The object cache allows you to cache Records (and other objects) in memory, this removes the requirements to connect to the database next time this object is requested.  This, is of course, most useful when certain Records are requested more than once.  You can increase this to up to 99,999 for server applications (see below).</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_578ee45d03596e4c839361e5_1468982371885__img.png_" alt="">
+  
+
+<h1>Workgroup Server Document Cache</h1>
+<p>When downloading a document it first must be fetched from the document store.  The streaming technique used means this should be fast enough but if not you can choose to cache the documents on the workgroup server itself, so if you run a workgroup server on the same machine as you host your web service the documents will be available locally and the web service will not request them from the document store.  Configure document caching in Enterprise Studio (see below).</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_578ee560440243f06f631261_1468982629478__img.png_" alt="">
+  
+
+<h1>Making this happen in your web service</h1>
+<p dir="ltr">To use the server object cache make sure you have called SetAsWebService, like this:</p>
+<pre class="source-code"><span class="cm-variable">TrimApplication</span>.<span class="cm-property">SetAsWebService</span>(<span class="cm-string">"c:\\MY_WORK_PATH"</span>);</pre>
+<p>To fetch documents from the workgroup server cache:</p>
+<ol dir="ltr">
+<li>configure the cache,</li>
+<li>call SetAsWebService</li>
+<li>get the file location using the Record property DocumentPathInWGSCache</li>
+</ol>
+</body></html>

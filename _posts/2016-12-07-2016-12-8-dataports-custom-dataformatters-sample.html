@@ -1,0 +1,333 @@
+---
+layout: post
+title: DataPort's Custom DataFormatters - Sample
+categories: []
+tags:
+- ".Net SDK"
+- DataPort
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>Many people know that, out-of-the-box, DataPort supports importing data from tab delimited text files.  Many people don't know that users can create custom formatters to allow data from any source to be imported.  Maybe 3 people know that our tab delimited formatter is actually a custom data formatter baked into DataPort.</p>
+<p>Below I have posted the code for a sample custom data formatter.  It is loosely based on our tab delimited formatter but will hopefully provide some good insight into how to develop one for an alternate type data source.</p>
+<h2>References</h2>
+<p>A custom data formatter requires that the following references are made:</p>
+<ol>
+<li>HP.HPTRIM.DataPort.Common.dll</li>
+<li>HP.HPTRIM.SDK.dll</li>
+<li>System.Windows.Forms.dll</li>
+<li>System.Drawing.dll</li>
+</ol>
+<h2>The Code</h2>
+<pre class="source-code">using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using HP.HPTRIM.DataPort;
+using HP.HPTRIM.DataPort.Framework.DataFormatters;
+
+namespace DataPortFormatter
+{
+    public class SampleFormatter : IImportDataFormatter
+    {
+        private string          m_fileName  = string.Empty;
+        private StreamReader    m_reader    = null;
+        private long            m_itemRow   = 0;
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// The caption that will be displayed above the KwikSelect control with 
+        /// which the user selects the source of the data to be imported.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        public string KwikSelectCaption
+        {
+            get
+            {
+                return "Path to the sample file";
+            }
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// The type of Origin to be created in HP Content Manager for the import.
+        /// Most likely one of either TextFile, WindowsFolder, XMLFile or Custom<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">n</span><span class="cm-tag cm-bracket">&gt;</span>.
+        /// The others are used by various in house integrations.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">summary</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        public HP.HPTRIM.SDK.OriginType OriginType
+        {
+            get
+            {
+                return HP.HPTRIM.SDK.OriginType.TextFile;
+            }
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// This event is called when a user clicks on the data source KwikSelect's button.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"parentForm"</span><span class="cm-tag cm-bracket">&gt;</span>The main TRIMDataPortConfig.exe form<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"searchPrefix"</span><span class="cm-tag cm-bracket">&gt;</span>The value that is in the text portion of the KwikSelect<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"suggestedBrowseUILocation"</span><span class="cm-tag cm-bracket">&gt;</span>The point at which we advise any dialogues should be placed.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>A string that this dataformatter will use to resolve the data source during an import<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>
+        public string Browse(System.Windows.Forms.Form parentForm, string searchPrefix, System.Drawing.Point suggestedBrowseUILocation, Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            string retVal = "";
+            FileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = "Text Files|*.txt|All Files|*.*";
+            fileDialog.InitialDirectory = searchPrefix;
+
+            if (fileDialog.ShowDialog(parentForm) == DialogResult.OK)
+            {
+                retVal = fileDialog.FileName;
+            }
+            return retVal;
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// DataPort has finished importing the data and no longer requires the data source.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        public void CloseConnection(Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            if (m_reader != null)
+            {
+                m_reader.Close();
+                m_reader.Dispose();
+                m_reader = null;
+            }
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// This function is called by DataPort when it needs to display the fields contained in the data source
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"validatedSource"</span><span class="cm-tag cm-bracket">&gt;</span>The already validated connection string for the data source<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>A list of field names available in the data source<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>
+        public List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span> GetFieldNames(string validatedSource, Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span> retVal = new List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span>();
+
+            using (StreamReader reader = new StreamReader(validatedSource))
+            {
+                string line = reader.ReadLine();
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    retVal = split(line, '\t');
+                }
+
+                reader.Close();
+            }
+
+            return retVal;
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// This function is called when DataPort is running an import to identify the data source 
+        /// in a manner that is useful to humans.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"validatedSource"</span><span class="cm-tag cm-bracket">&gt;</span>The already validated connection string for the data source<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>A human readable identifier for this formatter<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>
+        public string GetFormatterInfo(string validatedSource, Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            string retVal = "";
+
+            using (StreamReader reader = new StreamReader(validatedSource))
+            {
+                reader.ReadLine();
+                retVal = string.Format("{0}: {1}", validatedSource, reader.CurrentEncoding.EncodingName);
+                reader.Close();
+            }
+
+            return retVal;
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// Called during an import to obtain the items contained in the data source
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>
+        public ImportItem GetNextItem(Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            if (m_reader == null)
+            {
+                MessageBox.Show("The reader is null.  Something terrible has occurred.", "Formatter Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+
+            List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span> values = new List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span>();
+
+            if (m_reader.Peek() &gt; 0)
+            {
+                values = split(m_reader.ReadLine(), '\t');
+            }
+
+            m_itemRow++;
+
+            // Must return null when we're done.  A tab delim file is finished when it contains no more values...
+            ImportItem retVal = null;
+
+            if ( values.Count &gt; 0 )
+            {
+                retVal = new ImportItem(m_itemRow.ToString(), values);
+            }
+
+            return retVal;
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// This function is called when DataPort has completed the import.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"stats"</span><span class="cm-tag cm-bracket">&gt;</span>The statistics of what occurred in the import including things like the number created, updated or the errors that occurred.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        public void ImportCompleted(ProcessStatistics stats, Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            // You may want to write the stats to your own file or send an email or anything else that pleases you...
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// This function is called before DataPort uses a data source
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"validatedSource"</span><span class="cm-tag cm-bracket">&gt;</span>The already validated connection string for the data source<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        public void Initialize(string validatedSource, Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            m_fileName = validatedSource;
+
+            m_reader = new StreamReader(validatedSource);
+
+            m_reader.ReadLine(); // read the header row so GetNextItem returns the first line of Data
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// This function is called after every item that is imported.  This is a synchronous call so anything 
+        /// in this function will be processed before the next item can be imported.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"validatedSource"</span><span class="cm-tag cm-bracket">&gt;</span>The already validated connection string for the data source<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        public void ItemProcessed(ImportItem processedItem, Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            // You may use your imagination with this call...
+        }
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// This function is called by DataPort to allow the formatter to determine if the connection string
+        /// the user has selected is valid for the purpose.
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"parentForm"</span><span class="cm-tag cm-bracket">&gt;</span>The main DataPort Config form<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"connectionStringToValidate"</span><span class="cm-tag cm-bracket">&gt;</span>The connection string that the user has entered<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"additionalData"</span><span class="cm-tag cm-bracket">&gt;</span>Reserved for passing additional data through.  As of December 2016 only the DBid is provided.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>The connection string if valid or an empty string if not<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>
+        public string Validate(System.Windows.Forms.Form parentForm, string connectionStringToValidate, Dictionary<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">AdditionalDataKeys,</span> <span class="cm-attribute">DescriptiveData</span><span class="cm-tag cm-bracket">&gt;</span> additionalData)
+        {
+            string retVal = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(connectionStringToValidate) 
+                <span class="cm-error">&amp;</span><span class="cm-error">&amp;</span> File.Exists(connectionStringToValidate))
+            {
+                // For the sample we're just checking that the file exists.  It would be 
+                // prudent to open the file and check that it is in the correct format...
+                retVal = connectionStringToValidate;
+            }
+
+            return retVal;
+        }
+
+        #region Helper functions
+
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// Splits a string on a specific character as long as it is not escaped by a backslash '\'
+        /// <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">summary</span><span class="cm-tag cm-bracket">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"whichString"</span><span class="cm-tag cm-bracket">&gt;</span>The string to split<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">param</span> <span class="cm-attribute">name</span>=<span class="cm-string">"onWhichUnescapedChar"</span><span class="cm-tag cm-bracket">&gt;</span>The char on which to split<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">param</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+        /// <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">returns</span><span class="cm-tag cm-bracket">&gt;</span>
+        public static List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span> split(string whichString, Char onWhichUnescapedChar)
+        {
+            bool escaped = false;
+            List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span> retVal = new List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">string</span><span class="cm-tag cm-bracket">&gt;</span>();
+            List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">Char</span><span class="cm-tag cm-bracket">&gt;</span> currentEntry = new List<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">Char</span><span class="cm-tag cm-bracket">&gt;</span>();
+
+            foreach (Char c in whichString)
+            {
+                if (!escaped
+                    <span class="cm-error">&amp;</span><span class="cm-error">&amp;</span> c == onWhichUnescapedChar)
+                {
+                    retVal.Add(string.Join(string.Empty, currentEntry.ToArray()));
+                    currentEntry.Clear();
+                }
+                else
+                {
+                    currentEntry.Add(c);
+                    escaped = !escaped <span class="cm-error">&amp;</span><span class="cm-error">&amp;</span> c.Equals('\\');
+                }
+            }
+
+            retVal.Add(string.Join(string.Empty, currentEntry.ToArray()));
+
+            return retVal;
+        }
+
+        #endregion
+
+        #region IDisposable Support
+
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (m_reader != null)
+                    {
+                        this.CloseConnection(null);
+                    }
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~SampleFormatter() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose( )
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
+    }
+}
+</pre>
+<h2>Register the DataFormatter</h2>
+<p>Once your new formatter has been built you need to register it with DataPort.  To do this you need to edit the ImportDataFormatters file in %appdata%\Hewlett-Packard\HP TRIM\DataPort\Preferences.  The formatter needs to be registered on any machine that will create DataPort projects with DataPort Config Manager or run the import with the DataPort engine.</p>
+<pre class="source-code">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;ArrayOfDataFormatterDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;DataFormatterDefinition&gt;
+    &lt;DisplayName&gt;Tab Delimited&lt;/DisplayName&gt;
+    &lt;AssemblyName&gt;HP.HPTRIM.DataPort.Common.dll&lt;/AssemblyName&gt;
+    &lt;ClassName&gt;HP.HPTRIM.DataPort.Framework.DataFormatters.ImportDataFormatterTab&lt;/ClassName&gt;
+  &lt;/DataFormatterDefinition&gt;
+&lt;/ArrayOfDataFormatterDefinition</pre>
+<p>Now you need to add in a new DataFormatterDefinition for your formatter:</p>
+<pre class="source-code">&lt;DataFormatterDefinition&gt;
+  &lt;DisplayName&gt;What name would you like to display?&lt;/DisplayName&gt;
+  &lt;AssemblyName&gt;Path and name of the binary containing the formatter&lt;/AssemblyName&gt;
+  &lt;ClassName&gt;DataPortFormatter.SampleFormatter&lt;/ClassName&gt;
+&lt;/DataFormatterDefinition&gt;</pre>
+<p> </p>
+<p> </p>
+</body></html>

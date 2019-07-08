@@ -1,0 +1,41 @@
+---
+layout: post
+title: Upload a file and create a new revision
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>I just added a new sample to the documentation that ships with the ServiceAPI.  In the mean-time here it is, the two step process to first upload a file and then use it to create a new Rendition on a new Record.</p>
+<p>You could also use Record.FilePath to use the uploaded file to create the electronic document for the Record itself.</p>
+<pre class="source-code"><span class="cm-variable">FileInfo</span> <span class="cm-variable">fi</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">FileInfo</span>(<span class="cm-string">"c:\\junk\\test.pdf"</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">fileResponse</span> <span class="cm-operator">=</span> <span class="cm-variable">client</span>.<span class="cm-property">UploadFile</span>(<span class="cm-variable">fi</span>, <span class="cm-variable">System</span>.<span class="cm-property">Web</span>.<span class="cm-property">MimeMapping</span>.<span class="cm-property">GetMimeMapping</span>(<span class="cm-variable">fi</span>.<span class="cm-property">Name</span>));
+
+<span class="cm-variable">Record</span> <span class="cm-variable">rec</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Record</span>();
+<span class="cm-variable">rec</span>.<span class="cm-property">RecordType</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">RecordTypeRef</span>() { <span class="cm-variable">Uri</span> <span class="cm-operator">=</span> <span class="cm-number">2</span> };
+<span class="cm-variable">rec</span>.<span class="cm-property">Title</span> <span class="cm-operator">=</span> <span class="cm-string">"test"</span>;
+
+<span class="cm-variable">rec</span>.<span class="cm-property">ChildRenditions</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">List</span>();
+
+<span class="cm-variable">rec</span>.<span class="cm-property">ChildRenditions</span>.<span class="cm-property">Add</span>(<span class="cm-keyword">new</span> <span class="cm-variable">RecordRendition</span>()
+{
+    <span class="cm-variable">TypeOfRendition</span> <span class="cm-operator">=</span> <span class="cm-variable">RenditionType</span>.<span class="cm-variable">Longevity</span>,
+    <span class="cm-variable">FromFileName</span> <span class="cm-operator">=</span> <span class="cm-variable">fileResponse</span>.<span class="cm-variable">FilePath</span>,
+    <span class="cm-variable">Description</span> <span class="cm-operator">=</span> <span class="cm-string">"my PDF rendition"</span>
+});
+
+<span class="cm-variable">FileInfo</span> <span class="cm-variable">mainFile</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">FileInfo</span>(<span class="cm-string">"c:\\junk\\test.docx"</span>);
+
+<span class="cm-keyword">var</span> <span class="cm-def">response</span> <span class="cm-operator">=</span> <span class="cm-variable">client</span>.<span class="cm-property">PostFileWithRequest</span>(<span class="cm-variable">mainFile</span>, <span class="cm-variable">rec</span>);
+
+<span class="cm-variable">foreach</span> (<span class="cm-variable">Record</span> <span class="cm-variable">record</span> <span class="cm-keyword">in</span> <span class="cm-variable">response</span>.<span class="cm-variable">Results</span>)
+{
+    <span class="cm-variable">Console</span>.<span class="cm-property">WriteLine</span>(<span class="cm-variable">record</span>.<span class="cm-property">Title</span>);
+}</pre>
+</body></html>

@@ -1,0 +1,37 @@
+---
+layout: post
+title: Warning when setting the ACL via the SDK
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p dir="ltr">In the native (or web) client if I attempt to set an invalid ACL on a Record I will get a warning, something like this:</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5935e5a559cc68f8984f882c_1496704434539__img.png_" alt="">
+  
+
+<p>So, I asked myself, why was I not getting the same warning from the SDK?</p>
+<h1>A riddle</h1>
+<p>When will the appropriate warning appear in rec.ErrorMessage below...</p>
+<pre class="source-code"><span class="cm-tag">Record</span> <span class="cm-tag">rec</span> = <span class="cm-tag">new</span> <span class="cm-tag">Record</span>(<span class="cm-tag">db</span>, <span class="cm-string">"REC_2"</span>);
+
+<span class="cm-tag">TrimAccessControlList</span> <span class="cm-tag">acl</span> = <span class="cm-tag">rec</span><span class="cm-qualifier">.AccessControlList</span>;
+<span class="cm-tag">acl</span><span class="cm-qualifier">.SetAllInherited</span>();
+<span class="cm-tag">Console</span><span class="cm-qualifier">.WriteLine</span>(<span class="cm-string">"A {0}"</span>, <span class="cm-tag">rec</span><span class="cm-qualifier">.ErrorMessage</span>);
+<span class="cm-tag">rec</span><span class="cm-qualifier">.AccessControlList</span> = <span class="cm-tag">acl</span>;
+<span class="cm-tag">Console</span><span class="cm-qualifier">.WriteLine</span>(<span class="cm-string">"B {0}"</span>, <span class="cm-tag">rec</span><span class="cm-qualifier">.ErrorMessage</span>);
+<span class="cm-tag">rec</span><span class="cm-qualifier">.Verify</span>(<span class="cm-tag">true</span>);
+<span class="cm-tag">Console</span><span class="cm-qualifier">.WriteLine</span>(<span class="cm-string">"C {0}"</span>, <span class="cm-tag">rec</span><span class="cm-qualifier">.ErrorMessage</span>);
+<span class="cm-tag">rec</span><span class="cm-qualifier">.Save</span>();
+<span class="cm-tag">Console</span><span class="cm-qualifier">.WriteLine</span>(<span class="cm-string">"D {0}"</span>, <span class="cm-tag">rec</span><span class="cm-qualifier">.ErrorMessage</span>);</pre>
+<p>The only point at which a warning message will be present in rec.ErrorMessage is at 'B' above.  Due to the vagaries of the SDK property handling (as described <a href="/blog/2017/2/21/errormessage-in-the-visual-studio-debugger">here</a>) calling Verify (or Save() clears out the Error and ErrorMessage properties on the Record object.</p>
+<h1>The motto of the story</h1>
+<p>If you are interested in getting the warning from setting the ACL then check for it as soon as you set the AccessControlList property.</p>
+</body></html>

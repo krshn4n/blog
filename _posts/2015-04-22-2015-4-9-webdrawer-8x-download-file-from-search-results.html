@@ -1,0 +1,27 @@
+---
+layout: post
+title: Download a document directly from a list in WebDrawer
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Show Me</h1>
+<p>The default WebDrawer behaviour requires the user to open the Record details page before they can preview or download the electronic document.  This allows for a simple UI design that is easily made responsive to different screen sizes.  If you would prefer to be able to access the document without first opening the details page this post details some template customisations that will get you there.</p>
+<iframe src="https://player.vimeo.com/video/125672698" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<h1 id="yui_3_17_2_2_1429702037346_17391">Source</h1>
+<p>Here is the <a data-cke-saved-href="/s/MyViews.zip" href="/s/MyViews.zip">source </a>as demonstrated in the video. You may have noted that I overlooked something, when I added the RecordIsElectronic property to the 'properties' in hptrim.config this had the effect of also adding it to my view.  In MySearchResults.cshtml I have added some code to exclude that property.  It looks something lke this...</p>
+<h2>The exclusion list</h2>
+<pre class="source-code">string[] columnsToIgnore = new string[] { "RecordExtension", "RecordIsElectronic" };</pre>
+<h2>The if statement</h2>
+<pre class="source-code">if (!columnsToIgnore.Any(id =&gt; id == pfdef.Id))
+{
+...</pre>
+<h1>Simplification</h1>
+<p>If the code in MySearchResults.cshtml is a little too complex for your liking, for example we loop through Model.PropertiesAndFields[this.TrimHelper.TrimType] to get the list of properties to display based on the properties specified in hptrim.config.  You might choose to replace this block with something more like the simple table in this <a href="/blog/2015/4/15/simple-html-search-form">example</a>.</p>
+</body></html>

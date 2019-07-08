@@ -1,0 +1,122 @@
+---
+layout: post
+title: Customise the WebDrawer HTML preview page
+categories: []
+tags:
+- WebDrawer
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Update!</h1>
+<p dir="ltr">The solution I provide to display the native PDF in the preview page is flawed.  A better solution is available <a href="/2015/7/6/update-display-native-pdf-in-webdrawer">here</a>.</p>
+<h1>The problem</h1>
+<p>What if the HTML preview of a document is not displaying as you think it should?  Depending on the cause this may be out of our hands, however some problems can be avoided even if they cannot be completely resolved.</p>
+<h1>An Example</h1>
+<p>This particular post was spurred by one customer who was experiencing strange black boxes overlaying the HTML rendition of some PDFs.  It turns our that this was a problem in the rendered HTML  being exaggerated by the way the HTML was displayed in WebDrawer.</p>
+<h1>A Fix</h1>
+<p>In this video I spend the first half improving the viewing experience by displaying the HTML preview within an iframe, at about the 13 minute mark I look at how you might simply embed the native PDF in the preview page rather than rely on the HTML rendition of the PDF. </p>
+<p>Sorry about the audio levels in this, you may have to turn your volume up to full and listen carefully...</p>
+<iframe src="https://player.vimeo.com/video/126436866" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<p> </p>
+<h1>Scripts</h1>
+<p>This is the scripts section as seen in the above video.  It sets the iframe:</p>
+<ul>
+<li>height from the window heigh less the top position of the iframe (plus a 5 pixel buffer), and</li>
+<li>width to the window width less the iframe margin (10 pixels) plus the menu width (if the left menu is on the left).</li>
+</ul>
+<pre class="source-code">@section scripts {
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-keyword">var</span> <span class="cm-variable">resizePreview</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span> () {
+            <span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>).<span class="cm-property">show</span>();
+            <span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>).<span class="cm-property">css</span>(<span class="cm-string">"visibility"</span>, <span class="cm-string">"visible"</span>);
+
+            <span class="cm-keyword">var</span> <span class="cm-def">height</span> <span class="cm-operator">=</span> <span class="cm-variable">$</span>(<span class="cm-variable">window</span>).<span class="cm-property">height</span>() <span class="cm-operator">-</span> (<span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>).<span class="cm-property">offset</span>().<span class="cm-property">top</span> <span class="cm-operator">+</span> <span class="cm-number">5</span>);
+            <span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>).<span class="cm-property">height</span>(<span class="cm-variable-2">height</span>);
+
+
+            <span class="cm-keyword">var</span> <span class="cm-def">width</span> <span class="cm-operator">=</span> <span class="cm-variable">$</span>(<span class="cm-variable">window</span>).<span class="cm-property">width</span>() <span class="cm-operator">-</span> <span class="cm-number">10</span>;
+
+            <span class="cm-keyword">if</span> (<span class="cm-variable-2">width</span> <span class="cm-operator">&gt;</span> <span class="cm-number">630</span>) {
+                <span class="cm-variable-2">width</span> <span class="cm-operator">=</span> <span class="cm-variable-2">width</span> <span class="cm-operator">-</span> (<span class="cm-variable">$</span>(<span class="cm-string">'#leftcolumn'</span>).<span class="cm-property">width</span>());
+            }
+            <span class="cm-variable">$</span>(<span class="cm-string">'#preview-frame'</span>).<span class="cm-property">width</span>(<span class="cm-variable-2">width</span>);
+        }
+
+        <span class="cm-variable">$</span>(<span class="cm-keyword">function</span> () {
+            <span class="cm-variable">$</span>(<span class="cm-variable">window</span>).<span class="cm-property">on</span>(<span class="cm-string">"load resize"</span>, <span class="cm-keyword">function</span> () {
+                <span class="cm-variable">resizePreview</span>();
+            });
+        });
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">script</span><span class="cm-tag cm-bracket">&gt;</span>
+}</pre>
+<h1>Styles</h1>
+<p dir="ltr">These styles simply tweak some of the WebDrawer built-in styles to make the iframe fit better into the page.</p>
+<pre class="source-code">@section customhead {
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag">h2</span> {
+            <span class="cm-property">white-space</span>: <span class="cm-atom">normal</span>;
+        }
+
+        <span class="cm-builtin">#contentcolumn</span> {
+            <span class="cm-property">height</span>: <span class="cm-atom">auto</span>;
+            <span class="cm-property">padding-bottom</span>: <span class="cm-number">0</span>;
+        }
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">style</span><span class="cm-tag cm-bracket">&gt;</span>
+}</pre>
+<h1>Body</h1>
+<p dir="ltr">The body embeds the preview either using an iframe or as the actual source PDF.</p>
+<pre class="source-code">if (record.Html.Length == 0)
+{
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">"preview-pane"</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">div</span> <span class="cm-attribute">class</span>=<span class="cm-string">"alert"</span><span class="cm-tag cm-bracket">&gt;</span>
+           <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">strong</span><span class="cm-tag cm-bracket">&gt;</span>@Translations.lang.error<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">strong</span><span class="cm-tag cm-bracket">&gt;</span> @Translations.lang.no_html
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">div</span><span class="cm-tag cm-bracket">&gt;</span>
+}
+else
+{
+    if (record.Extension == "PDF")
+    {
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">object</span> 
+             <span class="cm-attribute">id</span>=<span class="cm-string">"preview-frame"</span>
+             <span class="cm-attribute">data</span>=<span class="cm-string">'~/Record/@record.Uri/file/document?inline'</span>
+             <span class="cm-attribute">type</span>=<span class="cm-string">'application/pdf'</span>
+              <span class="cm-attribute">width</span>=<span class="cm-string">'100%'</span>
+              <span class="cm-attribute">height</span>=<span class="cm-string">'100%'</span>
+              <span class="cm-attribute">style</span>=<span class="cm-string">"border:none; margin-left:10px; visibility:hidden;"</span><span class="cm-tag cm-bracket">&gt;</span>
+
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">p</span><span class="cm-tag cm-bracket">&gt;</span>
+               It appears your Web browser is not configured to display PDF files.
+                    No worries, just <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">'~/Record/@record.Uri/file/document?inline'</span><span class="cm-tag cm-bracket">&gt;</span>click here to download the PDF file.<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>
+            <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">p</span><span class="cm-tag cm-bracket">&gt;</span>
+
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">object</span><span class="cm-tag cm-bracket">&gt;</span>
+}
+        else
+        {
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">iframe</span> 
+               <span class="cm-attribute">id</span>=<span class="cm-string">"preview-frame"</span>
+               <span class="cm-attribute">src</span>=<span class="cm-string">"~/Record/@record.Uri/file/html"</span>
+               <span class="cm-attribute">style</span>=<span class="cm-string">"border:none; margin-left:10px; display:none;"</span><span class="cm-tag cm-bracket">&gt;</span>            <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">iframe</span><span class="cm-tag cm-bracket">&gt;</span>
+        }
+    }</pre>
+<h1>Record extension</h1>
+<p>In the code above record.Extension is referred to, depending on your version of WebDrawer Extension may not be available.  To verify this:</p>
+<ol>
+<li>open the hptrim.config file, </li>
+<li>find the customPropertySets element,</li>
+<li>within that find the RecordPreview, and</li>
+<li>it should contain RecordExtension.</li>
+</ol>
+<p>This code sample demonstrates the RecordPreview customPropertySet:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"RecordPreview"</span> <span class="cm-attribute">properties</span>=<span class="cm-string">"Html,Title,IsElectronic,RecordExtension,enabledcommandids,RecordIsInPartSeries,RecordRelatedRecs,RecordRecordType,RecordPrimaryContact,RecordIsContainer"</span><span class="cm-tag cm-bracket">/&gt;</span>
+</pre>
+<h1 id="yui_3_17_2_4_1435617118975_5120">The complete solution</h1>
+<p id="yui_3_17_2_4_1435617118975_5119">Get the complete template <a data-cke-saved-href="/s/MyRecordPreview.zip" href="/s/MyRecordPreview.zip">here</a>,  don't forget the other piece in the solution is to edit the routeDefault element in hptrim.config.</p>
+</body></html>

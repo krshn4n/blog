@@ -1,0 +1,23 @@
+---
+layout: post
+title: Stream a document in the .Net SDK
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>The standard methods of getting a document from in the SDK (e.g. Record.GetDocument()) fetch the entire document from the document store before giving you access to the document.  DownloadNotifier allows you to:</p>
+<ul>
+<li>not write a file to the file system but to a stream,</li>
+<li>fetch the document in chunks rather than waiting for the entire document, and</li>
+<li>start downloading part way through a file.</li>
+</ul>
+<p>I just updated the <a href="http://sdk.hpecm.xyz/92/advanced_topics.html#fetchDoc">SDK docs</a> to include some information on using it, also, here is a video if you want to watch me use it.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/271616694?app_id=122963&amp;wmode=opaque" width="576" height="360" frameborder="0" title="download_notifier" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+</body></html>

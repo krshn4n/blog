@@ -1,0 +1,46 @@
+---
+layout: post
+title: My first HPRM SDK application
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Introduction</h1>
+<p>If you are not a programmer but want to do some simple HPRM SDK programming here is a start.  It is actually quite easy to achieve some fairly powerful outcomes, like anything the curve gets steeper as your ambition grows.</p>
+<h1>The Video</h1>
+<p>Please forgive my constant sniffing in this video, I have been battling a cold for a week.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/131040934?wmode=opaque" width="640" height="360" frameborder="0" title="FirstSDKApp" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+ 
+<h1>The Code</h1>
+<pre class="source-code"><span class="cm-variable">using</span> (<span class="cm-variable">Database</span> <span class="cm-variable">database</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Database</span>())
+{
+    <span class="cm-variable">database</span>.<span class="cm-property">Id</span> <span class="cm-operator">=</span> <span class="cm-string">"F1"</span>;
+    <span class="cm-variable">database</span>.<span class="cm-property">Connect</span>();
+
+    <span class="cm-variable">using</span> (<span class="cm-variable">TrimMainObjectSearch</span> <span class="cm-variable">search</span> 
+           <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">TrimMainObjectSearch</span>(<span class="cm-variable">database</span>, <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-variable">Record</span>))
+    {
+        <span class="cm-variable">search</span>.<span class="cm-property">SetSearchString</span>(<span class="cm-string">"electronic"</span>);
+        <span class="cm-variable">using</span> (<span class="cm-variable">StreamWriter</span> <span class="cm-variable">textFile</span> 
+           <span class="cm-operator">=</span> <span class="cm-variable">File</span>.<span class="cm-variable">CreateText</span>(@<span class="cm-string">"d:\junk\myexport.csv"</span>))
+        {
+            <span class="cm-variable">foreach</span> (<span class="cm-variable">Record</span> <span class="cm-variable">record</span> <span class="cm-keyword">in</span> <span class="cm-variable">search</span>)
+            {
+                <span class="cm-variable">textFile</span>.<span class="cm-property">WriteLine</span>(<span class="cm-variable">string</span>.<span class="cm-property">Format</span>(
+                  <span class="cm-string">"{0},{1},{2}"</span>,
+                  <span class="cm-variable">record</span>.<span class="cm-property">Uri</span>, <span class="cm-variable">record</span>.<span class="cm-property">Number</span>, <span class="cm-variable">record</span>.<span class="cm-property">Title</span>));
+            }
+        }
+    }
+}
+
+
+</pre>
+</body></html>

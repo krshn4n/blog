@@ -1,0 +1,41 @@
+---
+layout: post
+title: Azure AD for Native Client
+categories: []
+tags:
+- Azure AD
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>For those who wish to use Azure AD to authenticate with the native Content Manager client here are the steps.</p>
+<p>In Azure AD create a native application, the Redirect URI must be urn:ietf:wg:oauth:2.0:oob</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5b2c4811f950b7e7eee721ce_1529628692533_create+native.PNG_" alt="">
+  
+
+<p>In App Registrations select Endpoints and take note of the following two endpoints for later:</p>
+<ul>
+<li>OAuth 2.0 Token Endpoint, and</li>
+<li>OAuth 2.0 Authorization Endpoint</li>
+</ul>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5b2c48c3562fa7f763253416_1529628881673_endpoints.PNG_" alt="">
+  
+
+<p>In CM Enterprise Studio select your database and from the context menu choose Authentication, then go to the ADFS / Azure tab. In this tab set:</p>
+<ul dir="ltr">
+<li>Authorize Endpoint URL to OAuth 2.0 Authorization Endpoint</li>
+<li>Token Endpoint URL to OAuth 2.0 Token Endpoint</li>
+<li>Client Id to the Application ID (in the Azure AD application you created)</li>
+<li>Relying Party Trust also set to the Application ID</li>
+</ul>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5b2c496faa4a99c8977b503e_1529629053857__img.png_" alt="">
+  
+
+<p>If you press Test Authenticate you should be able to authenticate as one of the users in Azure AD.</p>
+</body></html>

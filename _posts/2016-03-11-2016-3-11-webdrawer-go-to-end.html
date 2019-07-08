@@ -1,0 +1,60 @@
+---
+layout: post
+title: WebDrawer - go to end of search results
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Background</h1>
+<p>I had an enhancement request for the WebDrawer search results to include links in the paging to allow the user to go to the first or last page.  I thought I might as well post the code for earlier versions for those who may want to use it without waiting for the next major release.</p>
+<h1>The code</h1>
+<p>Simply replace the file Views\Shared\searchResults.cshtml with the fixed version for either <a href="https://integrationhprm.codeplex.com/SourceControl/latest#WebDrawer%20Plugins/PagingToEnd/82/Views/Shared/searchResults.cshtml">82</a> or <a href="https://integrationhprm.codeplex.com/SourceControl/latest#WebDrawer%20Plugins/PagingToEnd/83/Views/Shared/searchResults.cshtml">83</a>.</p>
+<h1>Manual Merge</h1>
+<p>If you have modified searchResults.cshtml you might prefer to merge my changes into your CSHTML.  Look for these changes:</p>
+<h3>Reduce number of items in page list from 7 to 4:</h3>
+<pre class="source-code"><span class="cm-tag">int</span> <span class="cm-tag">pagingLength</span> = <span class="cm-number">4</span>;</pre>
+<h3>Display a got to start link at the beginning:</h3>
+<pre class="source-code">if ((progressiveCount - 1) &gt; Model.Results.Count)
+{
+    queryString["pageSize"] = pageSize.ToString();
+    queryString["start"] = "1";
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"?@queryString.ToFormUrlEncoded()"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;laquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+    queryString["start"] = (progressiveCount - (pageSize * 2)).ToString();
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"?@queryString.ToFormUrlEncoded()"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;lt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+
+}
+else
+{
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span> <span class="cm-attribute">class</span>=<span class="cm-string">"disabled"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"#"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;laquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span> <span class="cm-attribute">class</span>=<span class="cm-string">"disabled"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"#"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;lt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+}
+</pre>
+<h3>Display a go to end link at the end:</h3>
+<pre class="source-code">if (progressiveCount <span class="cm-tag cm-bracket">&lt;</span> <span class="cm-tag">Model.TotalResults)</span>
+<span class="cm-attribute">{</span>
+    <span class="cm-attribute">queryString[</span><span class="cm-string cm-error">"pageSize"</span><span class="cm-attribute">]</span> = <span class="cm-string">pageSize.ToString();</span>
+    <span class="cm-attribute">queryString[</span><span class="cm-string cm-error">"start"</span><span class="cm-attribute">]</span> = <span class="cm-string">(progressiveCount</span> <span class="cm-null cm-error">=</span><span class="cm-null cm-error">=</span> <span class="cm-attribute">pageSize</span> <span class="cm-attribute">?</span> <span class="cm-attribute">progressiveCount</span> <span class="cm-attribute">+</span> <span class="cm-attribute">1</span> <span class="cm-attribute">:</span> <span class="cm-attribute">progressiveCount).ToString();</span>
+    <span class="cm-tag cm-error">&lt;li&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"?@queryString.ToFormUrlEncoded()"</span><span class="cm-tag cm-bracket">&gt;</span>&gt;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag cm-error">li</span><span class="cm-tag cm-bracket cm-error">&gt;</span>
+    queryString["start"] = (((totalPages - 1) * pageSize) + 1).ToString();
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"?@queryString.ToFormUrlEncoded()"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;raquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+}
+else
+{
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span> <span class="cm-attribute">class</span>=<span class="cm-string">"disabled"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"#"</span><span class="cm-tag cm-bracket">&gt;</span>&gt;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span> <span class="cm-attribute">class</span>=<span class="cm-string">"disabled"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"#"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;raquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+}</pre>
+</body></html>

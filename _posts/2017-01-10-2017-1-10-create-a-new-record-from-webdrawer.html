@@ -1,0 +1,51 @@
+---
+layout: post
+title: Create a new Record from WebDrawer
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>There are many samples in the ServiceAPI documentation for creating forms to create a new Record, you can adapt any of these to work in WebDrawer if you want to add a record creation form in your WebDrawer instance.  Here is a very simple first form... </p>
+<h1>Steps</h1>
+<h2>1. Create file</h2>
+<p>In the WebDrawer install folder create a new folder, give it any name (I called mine 'My'). Inside that folder create a text file (with a CSHTML extension) with any name (I called mine 'Page.cshtml').</p>
+<h2>2. Create a Form</h2>
+<p>Paste the code below into your new file:</p>
+<pre class="source-code">@{
+    ViewBag.Title = "Create and Upload a Document";
+
+    var recordTypes = this.TrimHelper.Search<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">RecordType</span><span class="cm-tag cm-bracket">&gt;</span>(
+        BaseObjectTypes.RecordType, "usable",
+        pageSize: 100, properties:new string[]{"Name"}, sortBy:new string[]{"Name"});
+}
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">form</span> <span class="cm-attribute">class</span>=<span class="cm-string">"trim-form"</span> <span class="cm-attribute">method</span>=<span class="cm-string">"post"</span> <span class="cm-attribute">action</span>=<span class="cm-string">"~/Record"</span> <span class="cm-attribute">enctype</span>=<span class="cm-string">"multipart/form-data"</span> <span class="cm-attribute">style</span>=<span class="cm-string">"margin-left:20px"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">type</span>=<span class="cm-string">"hidden"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Continue"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"Record?q=uri:{0}"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">fieldset</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">legend</span><span class="cm-tag cm-bracket">&gt;</span>Document details<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">legend</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>Record Type:<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">select</span> <span class="cm-attribute">name</span>=<span class="cm-string">"@PropertyIds.RecordRecordType"</span><span class="cm-tag cm-bracket">&gt;</span>
+            @foreach (var recordType in recordTypes)
+            {
+                <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">option</span> <span class="cm-attribute">value</span>=<span class="cm-string">"@recordType.Uri"</span><span class="cm-tag cm-bracket">&gt;</span>@recordType.Name<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">option</span><span class="cm-tag cm-bracket">&gt;</span>
+            }
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">select</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>Title<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">name</span>=<span class="cm-string">"@PropertyIds.RecordTitle"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>Files:<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">label</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">input</span> <span class="cm-attribute">type</span>=<span class="cm-string">"file"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Files"</span> <span class="cm-attribute">multiple</span>=<span class="cm-string">"multiple"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">type</span>=<span class="cm-string">"submit"</span> <span class="cm-attribute">class</span>=<span class="cm-string">"btn"</span><span class="cm-tag cm-bracket">&gt;</span>Submit<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">fieldset</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">form</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>3. Open the page</h2>
+<p>Because my folder is called 'My' and my page called 'Page.cshtml' I can open the page like this:</p>
+<pre class="source-code">http://MyServer/webdrawer/my/page</pre>
+<h1>Summary</h1>
+<p dir="ltr">Read through the ServiceAPI documentation and browse the samples for more ideas.  In essence you can create any type of RM object simply by posting a set of correctly named properties to the correct end point.</p>
+</body></html>

@@ -1,0 +1,40 @@
+---
+layout: post
+title: Checkin Style and Email deletion
+categories: []
+tags:
+- EmailLink
+- ExchangeLink
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>This is a note to clarify what happens to emails processed by CM EmailLink.</p>
+<h1>Content Manager 9.1</h1>
+  
+       <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5b049c5b2b6a284a30c9467f_1527028843092_chckinstyle_91.PNG_" alt=" In CM 9.1 there are two check boxes which impact what happens to the email after it has been filed in CM. ">  In CM 9.1 there are two check boxes which impact what happens to the email after it has been filed in CM.  
+  
+
+<h1>Content Manager 9.2</h1>
+  
+       <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5b049cd0575d1f7c79f1f180_1527029000964_checkinstyle_93.PNG_" alt=" In CM 9.2 there is one combo-box to choose what happens to the email after filing. ">  In CM 9.2 there is one combo-box to choose what happens to the email after filing.  
+  
+
+<h1>Mapping 9.1 to 9.2</h1>
+<p dir="ltr">The check boxes uses in 9.1 map to the (I believe) simpler UI in 9.2 like this:</p>
+<ul dir="ltr">
+<li>Permanent Delete - no check boxes selected.</li>
+<li>Move to Deleted Items - 'Keep email in the mail system' NOT selected and 'Move to deleted' selected.</li>
+<li>Retain in Mail System - 'Keep email in the mail system' selected and 'Move to deleted' NOT selected.</li>
+</ul>
+<h1>What actually happens</h1>
+<p dir="ltr">After the email has been filed in Content Manager one of three things happens:</p>
+<ul dir="ltr">
+<li>Permanent delete - the mail is hard deleted and is not available in the deleted items folder</li>
+<li>Move to deleted items - if a mail prefix is set in System Options it is pre-pended to the subject and the unique Id of the Record is set in a custom property on the email.  Then the email is moved to the Deleted items folder.</li>
+<li>Retain in Mail System - same as 'Move to deleted items' except the email is not moved to the Deleted Items folder.</li>
+</ul>
+</body></html>

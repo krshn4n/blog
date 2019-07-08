@@ -1,0 +1,32 @@
+---
+layout: post
+title: Lookupset Items in the .Net SDK
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p>In RM 82 Lookup Set Items were freed from the restrictions of being a child object type.  This means that a lookup set item is now a main object, at the same level as the lookup set itself.  Why was this done?  Mainly to allow for large lookup sets.  The parent child relationship among RM objects has practical limits on the number of children a main object can have.</p>
+<h1>Adding a new lookup item</h1>
+<p>The new way to add a new item is to instantiate it using the lookup set as the constructor parameter, for example:</p>
+<pre class="source-code"><span class="cm-variable">LookupSet</span> <span class="cm-variable">lookupSet</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">LookupSet</span>(<span class="cm-variable">database</span>, <span class="cm-number">9000000000</span>);
+<span class="cm-variable">LookupItem</span> <span class="cm-variable">lookupItem</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">LookupItem</span>(<span class="cm-variable">lookupSet</span>);
+
+<span class="cm-variable">lookupItem</span>.<span class="cm-property">Name</span> <span class="cm-operator">=</span> <span class="cm-string">"My Test"</span>;
+<span class="cm-variable">lookupItem</span>.<span class="cm-property">Save</span>();</pre>
+<h1>Fetching lookup items</h1>
+<p>You can get a list of lookup items just as you would any other main object type (e.g. record or location), using the TrimMainObjectSearch, as seen here.</p>
+<pre class="source-code"><span class="cm-variable">TrimMainObjectSearch</span> <span class="cm-variable">lookupItemSearch</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">TrimMainObjectSearch</span>(<span class="cm-variable">database</span>, <span class="cm-variable">BaseObjectTypes</span>.<span class="cm-property">LookupItem</span>);
+<span class="cm-variable">lookupItemSearch</span>.<span class="cm-property">SetSearchString</span>(<span class="cm-string">"set:9000000000"</span>);
+
+<span class="cm-variable">foreach</span> (<span class="cm-variable">LookupItem</span> <span class="cm-variable">item</span> <span class="cm-keyword">in</span> <span class="cm-variable">lookupItemSearch</span>)
+{
+    <span class="cm-variable">Console</span>.<span class="cm-property">WriteLine</span>(<span class="cm-variable">item</span>.<span class="cm-property">Name</span>);
+}</pre>
+</body></html>

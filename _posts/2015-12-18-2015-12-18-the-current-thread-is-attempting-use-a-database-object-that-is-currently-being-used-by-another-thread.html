@@ -1,0 +1,19 @@
+---
+layout: post
+title: The current thread is attempting use a database object that is currently being
+  used by another thread...
+categories: []
+tags: []
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>A sad story (with a happy ending)</h1>
+<p>A short post, on this potentially confusing error.  I remember some time ago spending much too long debugging an application with this error.  I knew that the D<a href="/2015/4/9/avoiding-memory-leaks-when-using-the-net-sdk">atabase was not thread safe</a> and I was sure that I was explicitly disposing every Database I instantiated.  It was a fairly large application though so I kept second guessing myself.  Also this was in 8.1, before we had removed <a href="/blog/2015/7/6/dispose-in-hprm-82">unnecessary use of IDisposable</a> so it was more difficult than it should have been to run code analysis to work out what I was not disposing.  Finally, I tracked it down, it was not a Database object at all, at least not directly, it was a TrimMainObjectSearch!  Someone (trust me, not I) had used a TrimMainObjectSearch without disposing it.  At some later time the <a href="https://msdn.microsoft.com/en-us/library/0xy59wtx(v=vs.110).aspx">GC </a>came along and attempted to clean it up, the TrimMainObjectSearch contains a reference to the Database and the GC was on a different thread, hence the error.</p>
+<h1>The moral of the story!</h1>
+<p>In versions of RM prior to 82 always explicitly dispose both your Database and TrimMainObjectSearch objects.</p>
+</body></html>

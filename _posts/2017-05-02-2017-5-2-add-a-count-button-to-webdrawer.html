@@ -1,0 +1,81 @@
+---
+layout: post
+title: Add a count button to WebDrawer
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>It is possible to speed up the search results in WebDrawer by switching to simpler page navigation.  This post shows how to add a 'Get Count' button to allow users to determine the total number of search results.</p>
+<p>Follow the steps in the video and use the code snippets below.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/215621297?wmode=opaque&amp;api=1" width="576" height="360" frameborder="0" title="webdrawer_paging" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+ 
+<h1>The Code</h1>
+<h2 dir="ltr">Views\Shared\searchResults.cshtml</h2>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">ul</span> <span class="cm-attribute">id</span>=<span class="cm-string">"trim-pagination"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span> <span class="cm-attribute">class</span>=<span class="cm-string">"@(start &lt; 2 ? "</span><span class="cm-attribute">disabled</span><span class="cm-string cm-error">" : null)"</span><span class="cm-tag cm-bracket">&gt;</span>
+        @if (start &gt; 1)
+            {
+                queryString["start"] = (start &gt; pageSize ? start - pageSize : 0).ToString();
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"?@queryString.ToFormUrlEncoded()"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;laquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>
+        }
+        else
+        {
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">span</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-atom">&amp;laquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">span</span><span class="cm-tag cm-bracket">&gt;</span>
+        }
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+        @{
+            var t = ((start - 1) / pageSize) + 1;
+        }
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">span</span><span class="cm-tag cm-bracket">&gt;</span>@t<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">span</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span> <span class="cm-attribute">class</span>=<span class="cm-string">"@(!this.Model.HasMoreItems ? "</span><span class="cm-attribute">disabled</span><span class="cm-string cm-error">" : null)"</span><span class="cm-tag cm-bracket">&gt;</span>
+        @if (this.Model.HasMoreItems)
+            {
+                start = (start == 0 ? start + 1 : start);
+                queryString["start"] = (start + pageSize).ToString();
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"?@queryString.ToFormUrlEncoded()"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;raquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>
+        }
+        else
+        {
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">span</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-atom">&amp;raquo;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">span</span><span class="cm-tag cm-bracket">&gt;</span>
+        }
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">id</span>=<span class="cm-string">"getCount"</span> <span class="cm-attribute">class</span>=<span class="cm-string">"btn search-btn count-btn"</span><span class="cm-tag cm-bracket">&gt;</span>Get Count <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">ul</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>css\main.css</h2>
+<pre class="source-code"><span class="cm-qualifier">.count-btn</span>
+{
+    <span class="cm-property">margin-left</span>: <span class="cm-number">20px</span>;
+    <span class="cm-property">margin-top</span>:<span class="cm-number">4px</span>;
+}
+
+<span class="cm-tag">html</span><span class="cm-qualifier">.busy</span>, <span class="cm-tag">html</span><span class="cm-qualifier">.busy</span> * {  
+  <span class="cm-property">cursor</span>: <span class="cm-atom">wait</span> <span class="cm-keyword">!important</span>;  
+} </pre>
+<h2>scripts\webdrawer.js</h2>
+<pre class="source-code"><span class="cm-variable">$</span>(<span class="cm-string">"html"</span>).<span class="cm-property">bind</span>(<span class="cm-string">"ajaxStart"</span>, <span class="cm-keyword">function</span> () {
+    <span class="cm-variable">$</span>(<span class="cm-keyword">this</span>).<span class="cm-property">addClass</span>(<span class="cm-string">'busy'</span>);
+}).<span class="cm-property">bind</span>(<span class="cm-string">"ajaxStop"</span>, <span class="cm-keyword">function</span> () {
+    <span class="cm-variable">$</span>(<span class="cm-keyword">this</span>).<span class="cm-property">removeClass</span>(<span class="cm-string">'busy'</span>);
+});
+
+
+<span class="cm-variable">$</span>(<span class="cm-string">"#getCount"</span>).<span class="cm-property">click</span>(<span class="cm-keyword">function</span> () {
+    <span class="cm-keyword">var</span> <span class="cm-def">q</span> <span class="cm-operator">=</span> <span class="cm-variable">location</span>.<span class="cm-property">href</span>;
+    <span class="cm-keyword">var</span> <span class="cm-def">my_url</span> <span class="cm-operator">=</span> <span class="cm-variable">location</span>.<span class="cm-property">href</span> <span class="cm-operator">+</span> <span class="cm-string">"&amp;format=json&amp;ExcludeCount=true&amp;CountResults=true"</span>;
+    <span class="cm-variable">$</span>.<span class="cm-property">get</span>(<span class="cm-variable-2">my_url</span>, <span class="cm-keyword">function</span> (<span class="cm-def">response</span>) {
+        <span class="cm-variable">$</span>(<span class="cm-string">"#getCount"</span>).<span class="cm-property">text</span>(<span class="cm-string">"Count: "</span> <span class="cm-operator">+</span> <span class="cm-variable-2">response</span>.<span class="cm-property">Count</span>);
+    });
+});</pre>
+</body></html>

@@ -1,0 +1,37 @@
+---
+layout: post
+title: SOAP web service remote troubleshooting
+categories: []
+tags:
+- SOAP WS
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Testing the connection</h1>
+<p>While it is possible to test the web service via a browser it is only possible to do this from the actual server machine.  If you are not able to connect directly to the server you may wish to use this <a href="/s/WsTestexe.zip">simple app</a> to check if the web service is actually running and that you can authenticate.  You can experiment with authentication and might see an error like this:</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_5526224ee4b060fb2f458fa9_1428562512129_wstest_error.PNG_" alt=" WS Error Message ">
+  
+
+<p>If you connect successfully you will see a response including the connected user name, like this:</p>
+  
+      <img src="/squarespace_images/static_5525c843e4b0788926c29a33_5525f2dce4b09e5532140872_552622f0e4b0e7fef53b65a7_1428562674472__img.png_" alt="">
+  
+
+<h1>Using WS Test</h1>
+<p dir="ltr">To use this test app simply:</p>
+<ol dir="ltr">
+<li>download the <a href="/s/WsTestexe.zip">test app</a>,</li>
+<li>unzip the contained files into a folder on your computer,</li>
+<li>run WsTest.exe,</li>
+<li>enter the URL for your web service,</li>
+<li>either choose Default Credentials or enter your user name, domain and password (domain optional), then</li>
+<li>press Go.</li>
+</ol>
+<p> </p>
+</body></html>

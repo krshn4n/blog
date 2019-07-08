@@ -1,0 +1,24 @@
+---
+layout: post
+title: ServiceAPI file upload with date created
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Intro</h1>
+<p>Today's question was how to upload a file including the date created.  One way to do it would be to transfer the file using some other process to the ServiceAPI server and then use the RecordFilePath property attach it to the record.  The other way is to send the RecordDateCreated property with the form post.</p>
+<h1>The code</h1>
+<p>This <a href="https://integrationhprm.codeplex.com/SourceControl/latest#80/ServiceAPI%20Samples/CreateWithDateCreated.cshtml">sample</a> can be installed by copying it into the ServiceAPI examples folder and then opening it like this: http://localhost/HPRMServiceAPI/examples/CreateWithDateCreated.</p>
+<h1>What it does</h1>
+<p>The sample contains more detailed description but in short it:</p>
+<ul>
+<li>includes a file upload form, and</li>
+<li>sets the RecordDateCreated from the file object using Javascript.</li>
+</ul>
+</body></html>

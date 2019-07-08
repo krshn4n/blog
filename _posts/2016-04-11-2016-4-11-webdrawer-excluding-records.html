@@ -1,0 +1,35 @@
+---
+layout: post
+title: WebDrawer - excluding records
+categories: []
+tags:
+- WebDrawer
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>WebDrawer (and the ServiceAPI) allow you to exclude Records (and other object types) from search results.  The trick is to find (or add) a routeDefault in hptrim.config.  In WebDrawer the record search already has defaults set in hptrim.config so you simply need to go to the routeDefaults elements, find the ADD element matching the one below and add the 'q' attribute. </p>
+<p>In the samples below the 'q' parameter will be added to every Record search.</p>
+<p>In this example I only want to include electronic documents.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span>
+  <span class="cm-attribute">name</span>=<span class="cm-string">"Record"</span>
+  <span class="cm-attribute">model</span>=<span class="cm-string">"Records"</span>
+  <span class="cm-attribute">template</span>=<span class="cm-string">"WDRecordList"</span>
+  <span class="cm-attribute">q</span>=<span class="cm-string">"electronic"</span>
+  <span class="cm-attribute">properties</span>=<span class="cm-string">"RecordRecordType,RecordExtension,RecordTitle,RecordNumber,RecordIsElectronic"</span>
+<span class="cm-tag cm-bracket">/&gt;</span></pre>
+<p>In this sample I only want non-electronic documents.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span>
+  <span class="cm-attribute">name</span>=<span class="cm-string">"Record"</span>
+  <span class="cm-attribute">model</span>=<span class="cm-string">"Records"</span>
+  <span class="cm-attribute">template</span>=<span class="cm-string">"WDRecordList"</span>
+  <span class="cm-attribute">q</span>=<span class="cm-string">"not electronic"</span>
+  <span class="cm-attribute">properties</span>=<span class="cm-string">"RecordRecordType,RecordExtension,RecordTitle,RecordNumber,RecordIsElectronic"</span>
+<span class="cm-tag cm-bracket">/&gt;</span></pre>
+<p>NOTE: The 'model' in the routeDefault above indicates that the elelement applies to record search results.  A model of 'Locations' would apply to location search results.</p>
+<p>More help: Route defaults are discussed in the online help shipped with the ServiceAPI under /help/routing.</p>
+</body></html>

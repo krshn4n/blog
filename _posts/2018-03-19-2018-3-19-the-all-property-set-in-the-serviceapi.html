@@ -1,0 +1,31 @@
+---
+layout: post
+title: The 'All' property set in the ServiceAPI
+categories: []
+tags:
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p>In the ServiceAPI there is a concept of a propertySet, this allows for the retrieval of a pre-defined set of properties, for example:</p>
+<pre class="source-code">/<span class="cm-tag">Record</span>?<span class="cm-tag">q</span>=<span class="cm-tag">all</span>&amp;<span class="cm-tag">propertySets</span>=<span class="cm-tag">Grid</span>&amp;<span class="cm-tag">format</span>=<span class="cm-tag">json</span></pre>
+<h1>The problem with 'All'</h1>
+<p>One of the property sets is 'All' which means that the above URL could look like this:</p>
+<pre class="source-code">/<span class="cm-tag">Record</span>?<span class="cm-tag">pageSize</span>=<span class="cm-number">20</span>&amp;<span class="cm-tag">q</span>=<span class="cm-tag">all</span>&amp;<span class="cm-tag">propertySets</span>=<span class="cm-tag">All</span>&amp;<span class="cm-tag">format</span>=<span class="cm-tag">json</span></pre>
+<p>Fetching all properties for many object types (such as Classification, SavedSearch, Activity etc) can be a good idea, being simpler than pre-determining which properties you need.  Using 'All' for Records is problematic, two problems being:</p>
+<ul>
+<li>some Record properties are very expensive so response times will be unnecessarily slow, and</li>
+<li>some properties will throw an error if the related feature is not enabled (e.g. NextTaskDue requires the Vital Records feature be enabled).</li>
+</ul>
+<h1>The solution</h1>
+<p>The solution is not to use 'All'. The alternatives are:</p>
+<ul>
+<li>use the 'ViewPane' property set instead, which returns a list of all properties that might be interesting to an end user, or</li>
+<li>construct a custom property set in hptrim.config which can contain all the properties that are of interest to your application.</li>
+</ul>
+</body></html>

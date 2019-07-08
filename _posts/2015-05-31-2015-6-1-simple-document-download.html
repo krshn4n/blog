@@ -1,0 +1,32 @@
+---
+layout: post
+title: Simple document download
+categories: []
+tags:
+- ServiceAPI
+- ".Net ServiceAPI Client"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Background</h1>
+<p>In a <a href="/blog/2015/5/28/download-a-child-document-using-the-net-client">previous post</a> I showed how to patch the ServiceAPI TrimClient to fix a problem with downloading child documents (e.g. record revisions).  A customer (Mark from <a href="http://www.westernaustralia.com/">WA</a>) pointed out a way to download a file to a stream without having to write it to a file.</p>
+<h1>Examples</h1>
+<p>The following code downloads a document using a stream.  I then save to a file but it could also be passed on as a stream or byte array to another system.</p>
+<pre class="source-code"><span class="cm-variable">Stream</span> <span class="cm-variable">stream</span> <span class="cm-operator">=</span> <span class="cm-variable">trimClient</span>.<span class="cm-property">Get</span><span class="cm-operator">&lt;</span><span class="cm-variable">Stream</span><span class="cm-operator">&gt;</span>(<span class="cm-variable">string</span>.<span class="cm-property">Format</span>(<span class="cm-string">"Record/{0}/File/Document"</span>, <span class="cm-number">1843</span>));
+<span class="cm-variable">using</span> (<span class="cm-variable">FileStream</span> <span class="cm-variable">fs</span> <span class="cm-operator">=</span> <span class="cm-variable">File</span>.<span class="cm-variable">Create</span>(<span class="cm-string">"d:\\junk\\myfile.xml"</span>))
+{
+    <span class="cm-variable">stream</span>.<span class="cm-property">CopyTo</span>(<span class="cm-variable">fs</span>);
+}</pre>
+<p>Below is the code to use to get a record revision as a stream.</p>
+<pre class="source-code"><span class="cm-variable">Stream</span> <span class="cm-variable">stream</span> <span class="cm-operator">=</span> <span class="cm-variable">trimClient</span>.<span class="cm-property">Get</span><span class="cm-operator">&lt;</span><span class="cm-variable">Stream</span><span class="cm-operator">&gt;</span>(<span class="cm-variable">string</span>.<span class="cm-property">Format</span>(<span class="cm-string">"Record/{0}/RecordRevision/{1}"</span>, <span class="cm-number">1843</span>, <span class="cm-number">12</span>));</pre>
+<h1>Side benefits</h1>
+<p dir="ltr">Two side benefits of this approach are:</p>
+<ol dir="ltr">
+<li>not having to write a file a file unnecessarily, and</li>
+<li>avoiding the non-thread safe approach in the <a href="/blog/2015/5/28/download-a-child-document-using-the-net-client">previous post</a>.</li>
+</ol>
+</body></html>

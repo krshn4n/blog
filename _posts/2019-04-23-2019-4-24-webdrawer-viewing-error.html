@@ -1,0 +1,47 @@
+---
+layout: post
+title: WebDrawer Viewing error
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p class="" style="white-space:pre-wrap;">The scenario:</p>
+<ol data-rte-list="default">
+<li><p class="" style="white-space:pre-wrap;">Open WebDrawer using Google Chrome</p></li>
+<li><p class="" style="white-space:pre-wrap;">find a record with a PDF document</p></li>
+<li><p class="" style="white-space:pre-wrap;">View it (using the Trapeze viewer</p></li>
+</ol>
+  
+      <img src="https://images.squarespace-cdn.com/content/v1/5525c843e4b0788926c29a33/1556060172353-GJ08WMDO8M3GPN5S5FVB/ke17ZwdGBToddI8pDm48kCJEcWAeQgbkBxEAUsV_OZVZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZamWLI2zvYWH8K3-s_4yszcp2ryTI0HqTOaaUohrI8PIk_aA0Ibshx2pWcJjrvjP_ObjTvJg37KV6BTY73o2Ezo/wd_error_1.PNG?format=original" alt="">
+  
+
+<p style="margin-left:40px;white-space:pre-wrap;" class="">4. Select the Document link</p>
+  
+      <img src="https://images.squarespace-cdn.com/content/v1/5525c843e4b0788926c29a33/1556060232544-3PD7YF9EQ8XO3LUFDGPP/ke17ZwdGBToddI8pDm48kHt_3KEv0lIa6VP2qt4wZXxZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZamWLI2zvYWH8K3-s_4yszcp2ryTI0HqTOaaUohrI8PIvHxvdKVSpenjXXvl2PS0Va-MnZ_1M076ZiRddfODcGA/wd_error_2.PNG?format=original" alt="">
+  
+
+<p style="margin-left:40px;white-space:pre-wrap;" class="">5. You will see this error</p>
+  
+      <img src="https://images.squarespace-cdn.com/content/v1/5525c843e4b0788926c29a33/1556060267347-P2JGRME8WKNIYUXQM47T/ke17ZwdGBToddI8pDm48kNRy5n9ah97D7jbc74ZvBWtZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZamWLI2zvYWH8K3-s_4yszcp2ryTI0HqTOaaUohrI8PIiG4rG_o6fyusuTBextygg3c0-7UdhtH_OOsjWU2MrVQ/wd_error_3.PNG?format=original" alt="">
+  
+
+<h1 style="white-space:pre-wrap;">The Fix</h1>
+<p class="" style="white-space:pre-wrap;">To fix this:</p>
+<ol data-rte-list="default">
+<li><p class="" style="white-space:pre-wrap;">open the file views\shared\menuButton.cshtml</p></li>
+<li>
+<p class="" style="white-space:pre-wrap;">look for this line: </p>
+<pre><code>&lt;a tabindex="-1" href="~/@menuItem.Value"&gt;@menuItem.Key&lt;/a&gt;</code></pre>
+</li>
+<li>
+<p class="" style="white-space:pre-wrap;">Change it to this:</p>
+<pre><code>&lt;a tabindex="-1" target="_top" href="~/@menuItem.Value"&gt;@menuItem.Key&lt;/a&gt;</code></pre>
+</li>
+</ol>
+</body></html>

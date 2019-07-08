@@ -1,0 +1,86 @@
+---
+layout: post
+title: ServiceAPI Plugin Example
+categories: []
+tags:
+- ServiceAPI
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Why?</h1>
+<p>The 811 ServiceAPI documentation contains a very simple example of a ServiceAPI plugin.  This example takes it one step forward and demonstrates hows to participate in the ServiceAPI pipeline to get a database connection for the current user.</p>
+<h1>Your Service</h1>
+<p>The service below inherits from the class TrimServiceBase which provides you with the property called 'Database'.  This is the best way to get a database connection for the current user as it uses the same mechanism to acquire (and release) a connection as used by every other service in the ServiceAPI.</p>
+<pre class="source-code">namespace ServiceAPIPlugin
+{
+
+    <span class="cm-comment">[Route("/Simple", "GET")]</span>
+    <span class="cm-comment">public class Simple</span>
+    <span class="cm-comment">{</span>
+        <span class="cm-comment">public long Uri { get; set; }</span>
+    <span class="cm-comment">}</span>
+
+    <span class="cm-comment">public class SimpleResponse</span>
+    <span class="cm-comment">{</span>
+        <span class="cm-comment">public string Name { get; set; }</span>
+        <span class="cm-comment">public string RecordTitle { get; set; }</span>
+    <span class="cm-comment">}</span>
+
+    <span class="cm-comment">public class SimpleService : TrimServiceBase</span>
+    <span class="cm-comment">{</span>
+        <span class="cm-comment">public object Get(Simple request)</span>
+        <span class="cm-comment">{</span>
+            <span class="cm-comment">SimpleResponse response = new SimpleResponse();</span>
+            <span class="cm-comment">if (request.Uri &gt; 0)</span>
+            <span class="cm-comment">{</span>
+                <span class="cm-comment">Record record = new Record(this.Database, request.Uri);</span>
+                <span class="cm-comment">response.RecordTitle = record.Title;</span>
+                <span class="cm-comment">response.Name = this.Database.CurrentUser.FormattedName;</span>
+            <span class="cm-comment">}</span>
+            <span class="cm-comment">return response;</span>
+        <span class="cm-comment">}</span>
+    <span class="cm-comment">}</span>
+}</pre>
+<h1>Wire it up</h1>
+<p>To wire this service into the ServiceAPI:</p>
+<ul>
+<li>create a project using the above code (or download the complete sample below),</li>
+<li>copy the file ServiceAPIPlugin.dll to your ServiceAPI bin folder, then</li>
+<li>add the XML below to the root of your hptrim.config.</li>
+</ul>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">pluginAssemblies</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"ServiceAPIPlugin"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">pluginAssemblies</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h1>A JSON response</h1>
+<p dir="ltr">You can get a JSON response from this service simply by calling it with the appropriate URL, for example:</p>
+<pre class="source-code">http://localhost/HPRMServiceAPI/simple?uri=9000000000&amp;format=json</pre>
+<h1>A Razor response</h1>
+<p>Of course you can also get a Razor response (and you can wire your service up in WebDrawer exactly as you do in the ServiceAPI).  The simplest way to get a Razor generated HTML response is to:</p>
+<ol>
+<li>create a file called SimpleServiceResponse.cshtml in the ServiceAPI (or WebDrawer) Views folder, and</li>
+<li>put some content similar to what you see below in it.</li>
+</ol>
+<pre class="source-code">@using HP.HPTRIM.Service
+@using ServiceStack;
+
+@inherits TrimViewPage<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">ServiceAPIPlugin.SimpleResponse</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">h1</span><span class="cm-tag cm-bracket">&gt;</span>My name is: @this.Model.Name<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">h1</span><span class="cm-tag cm-bracket">&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">h2</span><span class="cm-tag cm-bracket">&gt;</span>The title of record @this.Request.QueryString["uri"] is @this.Model.RecordTitle<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">h2</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h1>A complete example</h1>
+<p>This <a href="/s/ServiceAPIPlugin.zip">project</a> contains all you need to create this project in HPRM 811.  Some things to look out for:</p>
+<ul>
+<li>references to standard ServiceAPI and ServiceStack DLLs,</li>
+<li>a reference to HP.HPTRIM.SDK.dll to allow us to use the .Net SDK,</li>
+<li>the service follows the <a href="https://github.com/ServiceStack/ServiceStack/wiki/Your-first-webservice-explained">ServiceStack convention</a> of request/response/service, and</li>
+<li>the method Get in the service is for GET requests.  If you need to update HPRM add a Post method and a new request to use as the parameter in that method (analogous to the 'Simple' class.</li>
+</ul>
+<h1>Warning</h1>
+<p>The name of one of the referenced DLLs in the project above will likely change in a future release of HPRM and will necessitate a changing of the reference and a re-compile of the project for it to continue to work.</p>
+</body></html>

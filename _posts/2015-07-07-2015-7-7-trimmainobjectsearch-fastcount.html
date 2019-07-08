@@ -1,0 +1,25 @@
+---
+layout: post
+title: TrimMainObjectSearch FastCount
+categories: []
+tags:
+- ".Net SDK"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>The Problem(s)</h1>
+<p>In the .Net SDK TrimMainObjectSearch class we have a property called FastCount.  One problem is that it is not that fast, it is faster than reading the entire result set and counting manually but, especially on a large dataset, it can still be slow.  The other problem is that it can be optimistic, yes it is possible that it will say there are more results than you can actually see.</p>
+<h1>What is going on?</h1>
+<p>It is possible for a Record to have one or more ACL's set to 'Same as Container'.  Of course a container may also have one more more ACL's set to 'Same as Container'.  This reference style ACL is particularly complex to interrogate and we only support it to 2 levels at the database level.  Anything beyond two levels is managed by the security filtering code in the client/SDK.</p>
+<p>So, if you have Records set to 'Same as Container' and the container is also set to 'Same as Container' and they match your search criteria then FastCount will include these. This is because FastCount is calculated at the database level.</p>
+<h1>The moral</h1>
+<p>FastCount is interesting as a source of information but should not be relied upon as an exact count any more than my Google search which tells me there are (approx) 41, 300,000 results for the search 'apple pie'.</p>
+<h1>HPRM 82</h1>
+<p>HPRM 82 has a partial fix to the optimism of FastCount.  In the System options (under the Security tab) there is the option 'When counting search results, ensure full security filtering is applied when displaying totals'.  This causes the client / SDK to filter the search results to adjust FastCount.  The upside is that FastCount is now accurate, the downside is that it is slower.</p>
+<h1>The future</h1>
+<p>Hopefully the future holds a FastCount capable of dealing with deep reference style security at the database level, making it both fast(ish) and accurate.</p>
+</body></html>

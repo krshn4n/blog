@@ -1,0 +1,42 @@
+---
+layout: post
+title: Fetch a list of record revisions and display them in WebDrawer
+categories: []
+tags:
+- WebDrawer
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Intro</h1>
+<p>This video goes start to finish fetching a list of record revisions and creating a list in WebDrawer.  Along the way I show where in the ServiceAPI help I found all the information I needed to achieve this.</p>
+<iframe src="https://player.vimeo.com/video/126216823" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<h1 id="yui_3_17_2_12_1429601755396_6292">Sample Code</h1>
+<p id="yui_3_17_2_12_1429601755396_6290">In this video I call the ServiceAPI with a URL like the one below to fetch a list of record revisions.</p>
+<pre class="source-code">    <span class="cm-comment">http://localhost/HPRMServiceAPI/Record/REC_15?properties=ChildRevisions</span></pre>
+<p>I write this Razor code:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">ul</span><span class="cm-tag cm-bracket">&gt;</span>
+    @foreach (RecordRevision revision in this.Model.Results[0].ChildRevisions)
+    {
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"~/Record/@this.Model.Results[0].Uri/RecordRevision/@revision.Uri"</span><span class="cm-tag cm-bracket">&gt;</span>@revision.Description<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">li</span><span class="cm-tag cm-bracket">&gt;</span>
+    }
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">ul</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<p>Modify a routeDefault to look like this:</p>
+<pre class="source-code">    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> 
+      <span class="cm-attribute">name</span>=<span class="cm-string">"Record"</span> 
+      <span class="cm-attribute">model</span>=<span class="cm-string">"RecordFind"</span> 
+      <span class="cm-attribute">template</span>=<span class="cm-string">"MyRecordDetails"</span> 
+        <span class="cm-attribute">properties</span>=<span class="cm-string">"NameString,RecordIsElectronic,enabledcommandids,RecordRelatedRecs,RecordIsContainer,RecordIsInPartSeries,RecordRecordType,RecordPrimaryContact,RecordExtension,ChildRevisions"</span> 
+        <span class="cm-attribute">propertySets</span>=<span class="cm-string">"Identification,ChildDetails"</span><span class="cm-tag cm-bracket">/&gt;</span></pre>
+<p>Add this custom property Set:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"RecordRevisionChildDetails"</span> <span class="cm-attribute">propertySets</span>=<span class="cm-string">"All"</span> <span class="cm-attribute">properties</span>=<span class="cm-string">"RecordRevisionDescription,NameString"</span><span class="cm-tag cm-bracket">/&gt;</span></pre>
+<h1>Notes</h1>
+<p>The custom property set I added above has redundant information.  I specify the propertySet 'all' which means that I do not need to specify the individual properties at all.</p>
+<p>Also, you might notice a record revision property in the help that has a numeric ID (in fact I comment on this).  This was the result of me working with a partially re-built instance of HPRM.</p>
+<p>And lastly, if you see some odd looking things in WebDrawer (such as the 'Create' button) just ignore them.  They are a part of some other sample code I am currently part way through building.</p>
+</body></html>

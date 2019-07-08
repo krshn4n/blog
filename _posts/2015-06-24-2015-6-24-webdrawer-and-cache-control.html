@@ -1,0 +1,57 @@
+---
+layout: post
+title: WebDrawer and Cache-Control
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta:
+  structured_content: '{"oembed":{},"overlay":true}'
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Background</h1>
+<p>I occasionally get asked about setting the Cache-Control headers on WebDrawer responses.  By default WebDrawer sets the Cache-Control header to 'private', which means that the only place the content should be cached is in the end user's browser, not on any intermediate servers.</p>
+<h1>No-Cache</h1>
+<p>It seems that there are various certification tools that require cache-control headers other than 'private' be sent, for example No-Cache or No-Store.  While it is not possible to stop WebDrawer from sending private we can send these other directives in addition.</p>
+<h1>How To</h1>
+<p>Adding the customHeaders element within system.WebServer/httpProtocol (in web.config) will allow you to add options to cache-control.  The example below will result in the Cache-Control response header being set to 'private,No-Cache'.  Given that 'No-Cache' is more restrictive than 'private' this is equivalent to setting the Cache-Control header to 'No-Cache'.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.webServer</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">httpProtocol</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">customHeaders</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">clear</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Cache-Control"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"No-Cache"</span><span class="cm-tag cm-bracket">/&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">customHeaders</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">httpProtocol</span><span class="cm-tag cm-bracket">&gt;</span>
+  ...
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.webServer</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h1>What about things I do want to cache?</h1>
+<p>The setting above will set the Cache-Control header on all responses, including CSS, JavaScript and images, you may not want to do this.  We can switch these off by adding something similar to the above in the location element for the paths in which these static files are found.  Each of the paths 'scripts', 'css' and 'images' already has a location element in the WebDrawer web.config, we can modify each of these to look like the 'scripts' one below, this will remove any cache-control header set above.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">location</span> <span class="cm-attribute">path</span>=<span class="cm-string">"scripts"</span> <span class="cm-attribute">inheritInChildApplications</span>=<span class="cm-string">"false"</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.web</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">authorization</span><span class="cm-tag cm-bracket">&gt;</span>        
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">allow</span> <span class="cm-attribute">users</span>=<span class="cm-string">"*"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">authorization</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.web</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.webServer</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">httpProtocol</span><span class="cm-tag cm-bracket">&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">customHeaders</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">clear</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">remove</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Cache-Control"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+      <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">customHeaders</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">httpProtocol</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.webServer</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">location</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h1>Does this matter?</h1>
+<p>The fact that non-static WebDrawer pages (e.g. any search, record details etc) do not contain cache validation headers (such as Last-Modified or ETag) means that it is very unlikely that they will be cached on intermediate servers (as discussed <a href="https://www.mnot.net/blog/2009/02/24/unintended_caching">here</a>), however you may still wish to explicitly forbid this.   In addition, even though a browser is most likely to reload a dynamic page it is still likely to cache it on the user's local machine (in Google Chrome use chrome://cache to view cached pages).  Security concerns may mean you wish to prevent pages being cached locally, in which case you would set the header 'No-Store'.</p>
+<p>More Information</p>
+<p>Here are some posts I have found useful in discussing Cache-Control:</p>
+<ul dir="ltr">
+<li><a href="http://www.mobify.com/blog/beginners-guide-to-http-cache-headers/">A beginners Guide</a></li>
+<li>
+<a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=en">Http Caching</a> (at Google Developers)</li>
+<li><a href="https://www.mnot.net/blog/2009/02/24/unintended_caching">Caching when you least expect it</a></li>
+</ul>
+</body></html>

@@ -1,0 +1,101 @@
+---
+layout: post
+title: ADFS - Web Client Classic
+categories: []
+tags:
+- ADFS
+- Web Client
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>In <a href="/blog/2015/6/25/simple-webdrawer-adfs">another post</a> I have examined how to configure ADFS for WebDrawer, the process is very similar for Web Client Classic as can be seen in this video.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/144598299?app_id=122963&amp;wmode=opaque" width="640" height="360" frameborder="0" title="adfs_web_client_classic" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+ 
+<p> </p>
+<h1>Additional steps</h1>
+<p>Below I list all the configuration that requires modification, in addition to this you also need to:</p>
+<ul>
+<li>add a relying party trust in ADFS,</li>
+<li>enable anonymous authentication in IIS, and</li>
+<li>copy the file System.IdentityModel.Tokens.ValidatingIssuerNameRegistry.dll from your Web Client\bin folder to Web Client Classic\bin.</li>
+</ul>
+<p>I look at both of these in the video above.</p>
+<h1>Config to copy, paste and modify</h1>
+<h2>Overview</h2>
+<p>All of the modifications are made in the Web Client Classic web.config file.</p>
+<h2>configSections</h2>
+<p>Copy this into the configSections element.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">section</span> <span class="cm-attribute">name</span>=<span class="cm-string">"system.identityModel"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Configuration.SystemIdentityModelSection, System.IdentityModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">section</span> <span class="cm-attribute">name</span>=<span class="cm-string">"system.identityModel.services"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Services.Configuration.SystemIdentityModelServicesSection, System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"</span> <span class="cm-tag cm-bracket">/&gt;</span></pre>
+<h2>appSettings</h2>
+<p>Create an appSettings element and replace the URL to our ADFS server with your ADFS server.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">appSettings</span> <span class="cm-attribute">file</span>=<span class="cm-string">"user.config"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">key</span>=<span class="cm-string">"ida:FederationMetadataLocation"</span> <span class="cm-attribute">value</span>=<span class="cm-string">"https://adfs1.testteam.local/FederationMetadata/2007-06/FederationMetadata.xml"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">appSettings</span><span class="cm-tag cm-bracket">&gt;</span>
+</pre>
+<h2>authorization and authentication</h2>
+<p>These go inside the system.Web element, make sure you remove the existing authentication element.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">authorization</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">deny</span> <span class="cm-attribute">users</span>=<span class="cm-string">"?"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">authorization</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">authentication</span> <span class="cm-attribute">mode</span>=<span class="cm-string">"None"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+</pre>
+<h2>Modules</h2>
+<p dir="ltr">Inside the system.webServer/modules element add these two modules.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"WSFederationAuthenticationModule"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Services.WSFederationAuthenticationModule, System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="cm-attribute">preCondition</span>=<span class="cm-string">"managedHandler"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"SessionAuthenticationModule"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Services.SessionAuthenticationModule, System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="cm-attribute">preCondition</span>=<span class="cm-string">"managedHandler"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+</pre>
+<h2>WIFHandler</h2>
+<p dir="ltr">Add this location inside the root (configuration) element.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">location</span> <span class="cm-attribute">path</span>=<span class="cm-string">"WIFHandler"</span><span class="cm-tag cm-bracket">&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.web</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">httpRuntime</span> <span class="cm-attribute">requestValidationMode</span>=<span class="cm-string">"2.0"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.web</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">location</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>webHttpBinding</h2>
+<p dir="ltr">Find your webHttpBinding element and modify it to look like this.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">webHttpBinding</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">binding</span> <span class="cm-attribute">name</span>=<span class="cm-string">"hptrimBinding"</span> <span class="cm-attribute">sendTimeout</span>=<span class="cm-string">"00.10:00"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">security</span> <span class="cm-attribute">mode</span>=<span class="cm-string">"Transport"</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">transport</span> <span class="cm-attribute">clientCredentialType</span>=<span class="cm-string">"None"</span><span class="cm-tag cm-bracket">/&gt;</span>
+  <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">security</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">binding</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">webHttpBinding</span><span class="cm-tag cm-bracket">&gt;</span>
+</pre>
+<h2>system.identityModel</h2>
+<p dir="ltr">The XML below is taken directly from my web.config file so you will need to find all of the URLs pointing to my Web Client Classic and ADFS server and change them.  You will also need to use the powershell command  Get-AdfsCertificate to get your thumbprint.</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.identityModel</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">identityConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">audienceUris</span><span class="cm-tag cm-bracket">&gt;</span>
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">value</span>=<span class="cm-string">"https://rmcloudweb.testteam.local/HPRMWebClientClassic/"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">audienceUris</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">securityTokenHandlers</span><span class="cm-tag cm-bracket">&gt;</span>
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Services.Tokens.MachineKeySessionSecurityTokenHandler, System.IdentityModel.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">remove</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Tokens.SessionSecurityTokenHandler, System.IdentityModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">securityTokenHandlers</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">certificateValidation</span> <span class="cm-attribute">certificateValidationMode</span>=<span class="cm-string">"None"</span> <span class="cm-tag cm-bracket">/&gt;</span> 
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">issuerNameRegistry</span> <span class="cm-attribute">type</span>=<span class="cm-string">"System.IdentityModel.Tokens.ValidatingIssuerNameRegistry, System.IdentityModel.Tokens.ValidatingIssuerNameRegistry"</span><span class="cm-tag cm-bracket">&gt;</span>
+            <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">authority</span> <span class="cm-attribute">name</span>=<span class="cm-string">"http://ADFS1.testteam.local/adfs/services/trust"</span><span class="cm-tag cm-bracket">&gt;</span>
+                <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">keys</span><span class="cm-tag cm-bracket">&gt;</span>
+                    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">thumbprint</span>=<span class="cm-string">"538B9CF4D293995C9406D7EA74C3F7353C5DD62A"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+                <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">keys</span><span class="cm-tag cm-bracket">&gt;</span>
+                <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">validIssuers</span><span class="cm-tag cm-bracket">&gt;</span>
+                    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"http://ADFS1.testteam.local/adfs/services/trust"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+                <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">validIssuers</span><span class="cm-tag cm-bracket">&gt;</span>
+            <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">authority</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">issuerNameRegistry</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">identityConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.identityModel</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">system.identityModel.services</span><span class="cm-tag cm-bracket">&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">federationConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">cookieHandler</span> <span class="cm-attribute">requireSsl</span>=<span class="cm-string">"true"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+        <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">wsFederation</span> <span class="cm-attribute">passiveRedirectEnabled</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">issuer</span>=<span class="cm-string">"https://adfs1.testteam.local/adfs/ls"</span> <span class="cm-attribute">realm</span>=<span class="cm-string">"https://rmcloudweb.testteam.local/HPRMWebClientClassic/"</span> <span class="cm-attribute">reply</span>=<span class="cm-string">"https://rmcloudweb.testteam.local/HPRMWebClientClassic/WIFHandler"</span> <span class="cm-attribute">requireHttps</span>=<span class="cm-string">"true"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+    <span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">federationConfiguration</span><span class="cm-tag cm-bracket">&gt;</span>
+<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">system.identityModel.services</span><span class="cm-tag cm-bracket">&gt;</span>
+</pre>
+</body></html>

@@ -1,0 +1,23 @@
+---
+layout: post
+title: Remove page numbers to make WebDrawer faster
+categories: []
+tags:
+- WebDrawer
+- ServiceAPI
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Intro</h1>
+<p>I have previously discussed <a href="/2015/5/20/excludecount-and-performance">ExcludeCount</a> and <a href="/2015/5/21/simplified-paging">search result page numbers</a> and how we can improve WebDrawer search performance, especially for large databases.  In HPRM 82 this is all much simpler.</p>
+<h1>How to</h1>
+<p>WebDrawer 82 will adjust its paging model to use back and next, rather than numbered pages, if the search routes are set to show results only.  To do this you need to add resultsOnly="true" to the two record search routes in hptrim.config.  For example:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"FormSearch"</span> <span class="cm-attribute">model</span>=<span class="cm-string">"FormSearch"</span> <span class="cm-attribute">resultsOnly</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span>
+
+<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">add</span> <span class="cm-attribute">name</span>=<span class="cm-string">"Record"</span> <span class="cm-attribute">model</span>=<span class="cm-string">"Records"</span> <span class="cm-attribute">resultsOnly</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">...</span> <span class="cm-tag cm-bracket">/&gt;</span></pre>
+<p>When</p>
+</body></html>

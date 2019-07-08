@@ -1,0 +1,41 @@
+---
+layout: post
+title: WebDrawer preview page Links / Actions button
+categories: []
+tags:
+- WebDrawer
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>The problem</h1>
+<p dir="ltr">In some versions of WebDrawer you might have this experience:</p>
+<ul dir="ltr">
+<li>preview a document,</li>
+<li>select the Links / Actions button, then</li>
+<li>find yourself back at the main search page.</li>
+</ul>
+<h1>The cause</h1>
+<p dir="ltr">As is often the way a fix to one thing led to a breakage somewhere else.  Some documents (such as email items) contain links to attached files.  These links were breaking. To 'fix' this the following code was added to WDRecordPreview.cshtml.</p>
+<pre class="source-code">@section customhead {
+    @* This is so links in VMBX files do not link to /RecordHTML*@
+    <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">base</span> <span class="cm-attribute">href</span>=<span class="cm-string">"~/Record/"</span> <span class="cm-tag cm-bracket">/&gt;</span>
+}</pre>
+<p>Unfortunately the 'base' element broke the link in the Links / Actions menu.</p>
+<h1>Resolution</h1>
+<p>Later releases of WebDrawer fix this issue in one of two ways:</p>
+<ol>
+<li>
+<a href="/blog/2015/4/30/customise-the-webdrawer-html-preview-page">embed the preview HTML via an iframe</a> so that the 'base' element is no longer required, or</li>
+<li>fix the links in the HTML so that the 'base' element is no longer required. </li>
+</ol>
+<h1>Fixing the HTML</h1>
+<p>WDRecordPreview.cshtml contains this line of code:</p>
+<pre class="source-code">@record.Html.Replace("src=\"", "src=\"../Record/")</pre>
+<p>Replace it with this:</p>
+<pre class="source-code">@record.Html.Replace("src=\"", "src=\"../Record/").Replace(string.Format("href=\"{0}", record.Uri), string.Format("href=\"../Record/{0}", record.Uri)).AsRaw()</pre>
+<p>Also remove the customhead section containing the base element.</p>
+</body></html>

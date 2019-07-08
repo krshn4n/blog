@@ -1,0 +1,27 @@
+---
+layout: post
+title: Deleting in the ServiceAPI
+categories: []
+tags: []
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p style="white-space:pre-wrap;">Strangely enough there are multiple paths via which you might choose to delete a Record in the ServiceAPI.  When looking back on how this choice was made I tend to agree with Elizabeth Bennett  that a <a href="http://www.austenquotes.com/a-good-memory-i/">good memory is unpardonable</a>,  but, is it a problem that there are multiple ways to delete a Record?</p>
+<h1 style="white-space:pre-wrap;">Delete via Record post</h1>
+<p style="white-space:pre-wrap;">The first method is to use a service action, that is to post JSON similar to that below to the Record endpoint.  Not only does this attempt to delete the Record but also allows you to make updates to properties (and save) the Record prior to delete being called.</p>
+<pre class="source-code">{
+    <span class="cm-string">"Uri"</span>: <span class="cm-number">9000000544</span>,
+    <span class="cm-string">"DeleteRecord"</span>: {
+        <span class="cm-string">"DeleteRecordDeleteContents"</span>: <span class="cm-atom">false</span>
+    }
+}</pre>
+<h1 style="white-space:pre-wrap;">Delete via delete service</h1>
+<p style="white-space:pre-wrap;">The other way to delete is simply to post to the delete service using a URL like this:</p>
+<pre class="source-code">http://localhost/ServiceAPI/Record/rec_364/Delete</pre>
+<h1 style="white-space:pre-wrap;">And the winner is…</h1>
+<p style="white-space:pre-wrap;">Avoid the first option and use the second option.  Why? The first option, in addition to deleting the Record, does all of the processing required when updating properties and fields.  This is unnecessary when you are deleting and is likely to cause errors. The second option avoids all the unnecessary pipeline and simply deletes the Record making it much more robust.</p>
+</body></html>

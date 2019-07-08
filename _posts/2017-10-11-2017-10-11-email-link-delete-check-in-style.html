@@ -1,0 +1,60 @@
+---
+layout: post
+title: Email Link - Delete Check in Style
+categories: []
+tags:
+- EmailLink
+- ExchangeLink
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<p>The CM Rambler showed how to <a href="https://www.cmramble.com/blog/2017/10/3/making-the-emaillink-admin-console-easier-to-use">improve the Email Link Admin console</a>, this post shows how you might add a facility to delete a user's Check in Style from within the admin console.  My main motivation for this is that there is a version of Content Manager out there which makes it difficult for a user to delete a user's check in style from the client, which is a problem when, for example, a user leaves the organisation.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/237666535?wmode=opaque" width="576" height="360" frameborder="0" title="Delete Checkin Style" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+ 
+<p> </p>
+<h1>The code</h1>
+<p>As per the video above</p>
+<h2>An empty TH</h2>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">th</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">th</span><span class="cm-tag cm-bracket">&gt;</span></pre>
+<h2>A table cell containing a button</h2>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">td</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">button</span> <span class="cm-attribute">class</span>=<span class="cm-string">"btn btn-small"</span> <span class="cm-attribute">data-place-uri</span>=<span class="cm-string">"@record.Uri"</span><span class="cm-tag cm-bracket">&gt;</span>Delete<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">button</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">td</span><span class="cm-tag cm-bracket">&gt;</span> </pre>
+<h2>The script</h2>
+<pre class="source-code"><span class="cm-variable">$</span>(<span class="cm-string">"button[data-place-uri!=''][data-place-uri]"</span>).<span class="cm-property">on</span>(<span class="cm-string">"click"</span>, <span class="cm-keyword">function</span> (<span class="cm-def">event</span>) {
+    <span class="cm-keyword">var</span> <span class="cm-def">placeUri</span> <span class="cm-operator">=</span> <span class="cm-variable">$</span>(<span class="cm-keyword">this</span>).<span class="cm-property">attr</span>(<span class="cm-string">'data-place-uri'</span>);
+
+    <span class="cm-variable">$</span>.<span class="cm-property">ajax</span>({
+        <span class="cm-property">url</span>: <span class="cm-string">"CheckinPlace?q=Uri:"</span> <span class="cm-operator">+</span> <span class="cm-variable-2">placeUri</span> <span class="cm-operator">+</span> <span class="cm-string">"&amp;resultsOnly=true"</span>,
+        <span class="cm-property">data</span>: {
+            <span class="cm-property">properties</span>: <span class="cm-string">"CheckinPlaceCheckinAs"</span>
+        },
+        <span class="cm-property">dataType</span>: <span class="cm-string">'json'</span>
+    })
+    .<span class="cm-property">done</span>(<span class="cm-keyword">function</span> (<span class="cm-def">data</span>) {
+
+        <span class="cm-keyword">for</span> (<span class="cm-keyword">var</span> <span class="cm-def">n</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable-2">n</span> <span class="cm-operator">&lt;</span> <span class="cm-variable-2">data</span>.<span class="cm-property">Results</span>.<span class="cm-property">length</span>; <span class="cm-variable-2">n</span><span class="cm-operator">++</span>) {
+            <span class="cm-keyword">var</span> <span class="cm-def">place</span> <span class="cm-operator">=</span> <span class="cm-variable-2">data</span>.<span class="cm-property">Results</span>[<span class="cm-variable-2">n</span>];
+
+            <span class="cm-keyword">if</span> (<span class="cm-variable-2">place</span>.<span class="cm-property">CheckinPlaceCheckinAs</span>) {
+                <span class="cm-variable">$</span>.<span class="cm-property">ajax</span>({
+                    <span class="cm-property">url</span>: <span class="cm-string">"CheckinStyle/"</span> <span class="cm-operator">+</span> <span class="cm-variable-2">place</span>.<span class="cm-property">CheckinPlaceCheckinAs</span>.<span class="cm-property">Uri</span> <span class="cm-operator">+</span> <span class="cm-string">"/Delete"</span>,
+                    <span class="cm-property">type</span>: <span class="cm-string">'POST'</span>,
+                    <span class="cm-property">dataType</span>: <span class="cm-string">'json'</span>,
+                    <span class="cm-property">contentType</span>: <span class="cm-string">'application/json'</span>
+                })
+                .<span class="cm-property">done</span>(<span class="cm-keyword">function</span> (<span class="cm-def">response</span>, <span class="cm-def">statusText</span>) {
+                    <span class="cm-keyword">if</span> (<span class="cm-variable-2">statusText</span> <span class="cm-operator">===</span> <span class="cm-string">"success"</span>) {
+                        <span class="cm-variable">window</span>.<span class="cm-property">location</span>.<span class="cm-property">reload</span>();
+                    }
+                })
+            }
+        }
+
+    });
+
+});</pre>
+</body></html>

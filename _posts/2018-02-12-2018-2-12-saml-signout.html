@@ -1,0 +1,44 @@
+---
+layout: post
+title: SAML signout
+categories: []
+tags:
+- ServiceAPI
+- Web Client
+- Authentication
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Overview</h1>
+<p>In a <a href="/blog/2018/2/12/saml-support">previous post</a> I show how to use Component Space to add SAML support to the Web Client, here I add a sign-out button.</p>
+<h1>Steps</h1>
+<h2>useADFS == true</h2>
+<p>Set useADFS to true in hprmServiceAPI.config, for example:</p>
+<pre class="source-code"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">setup</span> <span class="cm-attribute">databaseId</span>=<span class="cm-string">"J1"</span>  <span class="cm-attribute">searchAhead</span>=<span class="cm-string">"false"</span> <span class="cm-attribute">advancedSearch</span>=<span class="cm-string">"false"</span> <span class="cm-attribute">workpath</span>=<span class="cm-string">"C:\HP Records Manager\ServiceAPIWorkpath\Uploads"</span> <span class="cm-attribute">useADFS</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></pre>
+<h2>Setup signing certificate</h2>
+<p>If you plan to sign your logout request then you will need a certificate, either encrypt the password or store the certificate in the Windows certificate store as described in this Component Space <a href="https://www.componentspace.com/Forums/44/X.509-Certificate-Management">document</a>.</p>
+<h1>Add keep-alive</h1>
+<p>To allow for notification when the user's session has expired add the keep alive loop.  To do this edit _Initialisation.cshtml (or _Shared.cshtml in later versions) and comment out the RMStayALive function, then add this new version:</p>
+<pre class="source-code"><span class="cm-keyword">var</span> <span class="cm-def">RMStayALive2</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span> () {
+    <span class="cm-keyword">var</span> <span class="cm-def">makeRequest</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span> () {
+        <span class="cm-variable">$</span>.<span class="cm-property">getJSON</span>(<span class="cm-variable">HP</span>.<span class="cm-property">HPTRIM</span>.<span class="cm-property">TrimClient</span>.<span class="cm-property">getServiceAPIUrl</span>() <span class="cm-operator">+</span> <span class="cm-string">"/Location/me"</span>, <span class="cm-keyword">function</span> (<span class="cm-def">data</span>, <span class="cm-def">status</span>, <span class="cm-def">xhr</span>) {
+                
+        }).<span class="cm-property">fail</span>(<span class="cm-keyword">function</span> () { 
+            <span class="cm-keyword">if</span> (<span class="cm-variable">confirm</span>(<span class="cm-string">"Your session has expired, do you wish to re-authenticate?"</span>)) {
+                <span class="cm-variable">top</span>.<span class="cm-property">location</span> <span class="cm-operator">=</span> <span class="cm-variable">HPRMWebConfig</span>.<span class="cm-property">virtualDirectory</span>;
+            }
+            
+        });
+    }
+    <span class="cm-variable">setInterval</span>(<span class="cm-variable-2">makeRequest</span>, (<span class="cm-number">60</span> <span class="cm-operator">*</span> <span class="cm-number">1000</span>));
+
+}();</pre>
+<h1>Video</h1>
+<p dir="ltr">The process above is shown in this video.</p>
+ 
+   <iframe src="https://player.vimeo.com/video/255317779?wmode=opaque" width="576" height="360" frameborder="0" title="SAML_signout" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+</body></html>

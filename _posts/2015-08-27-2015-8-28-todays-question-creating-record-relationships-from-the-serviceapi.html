@@ -1,0 +1,59 @@
+---
+layout: post
+title: Today's question - creating record relationships from the ServiceAPI
+categories: []
+tags:
+- ServiceAPI
+- ".Net ServiceAPI Client"
+status: publish
+type: post
+published: true
+meta: {}
+---
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><body>
+<h1>Background</h1>
+<p>In HPRM records may have a variety of different relationships, from 'Redaction of' to 'Related to'.  These relationships are managed in both the SDK and ServiceAPI via the child collection construct.  To add a relationship you add a new item to the ChildRelationships collection, to remove a relationship you remove an item from this collection.</p>
+<h1>C#</h1>
+<p>This code will create a new relationship using the .Net client for the ServiceAPI.</p>
+<pre class="source-code"><span class="cm-tag">TrimClient</span> <span class="cm-tag">trimClient</span> = <span class="cm-tag">new</span> <span class="cm-tag">TrimClient</span>(<span class="cm-string">"http://MyHost]/ServiceAPI"</span>);
+<span class="cm-tag">trimClient</span><span class="cm-qualifier">.Credentials</span> = <span class="cm-tag">System</span><span class="cm-qualifier">.Net</span><span class="cm-qualifier">.CredentialCache</span><span class="cm-qualifier">.DefaultCredentials</span>;
+
+<span class="cm-tag">Record</span> <span class="cm-tag">record</span> = <span class="cm-tag">new</span> <span class="cm-tag">Record</span>() { <span class="cm-property cm-error">Uri</span> = <span class="cm-number">9000000001</span> };
+<span class="cm-tag">record</span><span class="cm-qualifier">.ChildRelationships</span> = <span class="cm-tag">new</span> <span class="cm-tag">List</span>&lt;<span class="cm-tag">RecordRelationship</span>&gt;() { 
+    <span class="cm-property cm-error">new</span> <span class="cm-property cm-error">RecordRelationship</span>() { 
+        <span class="cm-property cm-error">RelatedRecord</span> = <span class="cm-property cm-error">new</span> <span class="cm-property cm-error">RecordRef</span>() { <span class="cm-property cm-error">Uri</span> = <span class="cm-number">9000000003</span>}, 
+        <span class="cm-property cm-error">RelationType</span> = <span class="cm-property cm-error">RecordRelationshipType</span><span class="cm-error">.IsRelatedTo</span>
+    }};
+
+<span class="cm-tag">trimClient</span><span class="cm-qualifier">.Post</span>&lt;<span class="cm-tag">RecordsResponse</span>&gt;(<span class="cm-tag">record</span>);</pre>
+<h1>Javascript</h1>
+<p>Assuming you are using jQuery this code will create a record relationship from Javascript, the complete code can be found <a href="https://integrationhprm.codeplex.com/SourceControl/latest#80/ServiceAPI%20Samples/RecordRelationship.cshtml">here</a>.</p>
+<pre class="source-code"><span class="cm-variable">$</span>().<span class="cm-property">ready</span>(<span class="cm-keyword">function</span> () {
+    <span class="cm-variable">$</span>(<span class="cm-string">'#recordRelationship'</span>).<span class="cm-property">submit</span>(<span class="cm-keyword">function</span> () {
+        <span class="cm-keyword">var</span> <span class="cm-def">data</span> <span class="cm-operator">=</span> { <span class="cm-string cm-property">"Uri"</span>: <span class="cm-variable">$</span>(<span class="cm-string">"input[name=Uri]"</span>).<span class="cm-property">val</span>() }
+
+        <span class="cm-variable-2">data</span>[<span class="cm-string">"ChildRelationships"</span>] <span class="cm-operator">=</span> [{
+            <span class="cm-string cm-property">"RecordRelationshipRelatedRecord"</span>: <span class="cm-variable">$</span>(<span class="cm-string">"input[name=RelatedUri]"</span>).<span class="cm-property">val</span>(),
+            <span class="cm-string cm-property">"RecordRelationshipRelationType"</span>: <span class="cm-string">"IsRelatedTo"</span>                    
+        }];
+
+        <span class="cm-variable">$</span>.<span class="cm-property">ajax</span>({
+            <span class="cm-property">url</span>: <span class="cm-string">"Record"</span>,
+            <span class="cm-property">type</span>: <span class="cm-string">'POST'</span>,
+            <span class="cm-property">contentType</span>: <span class="cm-string">'application/json'</span>,
+            <span class="cm-property">data</span>: <span class="cm-variable">JSON</span>.<span class="cm-property">stringify</span>(<span class="cm-variable-2">data</span>)
+
+        })
+        .<span class="cm-property">done</span>(<span class="cm-keyword">function</span> (<span class="cm-def">response</span>, <span class="cm-def">statusText</span>) {
+            <span class="cm-variable">alert</span>(<span class="cm-string">"success"</span>);
+        })
+        .<span class="cm-property">fail</span>(<span class="cm-keyword">function</span> (<span class="cm-def">xhr</span>) {
+            <span class="cm-keyword">var</span> <span class="cm-def">err</span> <span class="cm-operator">=</span> <span class="cm-variable">eval</span>(<span class="cm-string">"("</span> <span class="cm-operator">+</span> <span class="cm-variable-2">xhr</span>.<span class="cm-property">responseText</span> <span class="cm-operator">+</span> <span class="cm-string">")"</span>);
+            <span class="cm-variable">alert</span>(<span class="cm-variable-2">err</span>.<span class="cm-property">ResponseStatus</span>.<span class="cm-property">Message</span>);
+        });
+
+        <span class="cm-keyword">return</span> <span class="cm-atom">false</span>;
+    });
+});</pre>
+</body></html>

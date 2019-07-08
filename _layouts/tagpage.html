@@ -31,7 +31,7 @@ layout: default
   {% assign tagitems = temptag | split: '#' %}
   {% capture tagname %}{{ tagitems[1] }}{% endcapture %}
   
-  <h5 name="{{ tagname }}"><nobr>{{ tagname }}</nobr></h5>
+  <h5><a name="{{ tagname }}"></a><nobr>{{ tagname }}</nobr></h5>
   
   <ul>
 {% for post in site.tags[tagname] %}

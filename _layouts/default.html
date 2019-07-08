@@ -3,6 +3,10 @@
   <head>
     <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }} – {{ site.description }}</title>
 
+{% if site.tags != "" %}
+  {% include collecttags.html %}
+{% endif %}
+
     {% include meta.html %}
 
     <!--[if lt IE 9]>
@@ -43,6 +47,12 @@
         <footer class="footer">
           {% include svg-icons.html %}
         </footer>
+		<span>[
+  {% for tag in page.tags %}
+    {% capture tag_name %}{{ tag }}{% endcapture %}
+    <a href="/tag/{{ tag_name }}"><code class="highligher-rouge"><nobr>{{ tag_name }}</nobr></code>&nbsp;</a>
+  {% endfor %}
+]</span>
       </div>
     </div>
 

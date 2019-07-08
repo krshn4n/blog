@@ -21,12 +21,14 @@ footer-links:
   email:
   facebook:
   flickr:
-  github: barryclark/jekyll-now
+  github: https://github.com/content-manager-sdk/Community
   instagram:
   linkedin:
   pinterest:
-  rss: # just type anything here for a working RSS icon
-  twitter: jekyllrb
+  rss: feed
+  twitter: 
+  vimeo: https://vimeo.com/user39269912
+  community: https://community.microfocus.com/t5/Content-Manager-User-Discussions/bd-p/itrc-1015
   stackoverflow: # your stackoverflow profile, e.g. "users/50476/bart-kiers"
   youtube: # channel/<your_long_string> or user/<user-name>
   googleplus: # anything in your profile username that comes after plus.google.com/

@@ -11,15 +11,8 @@ layout: default
   </li>
 {% endfor %}
 </ul>
-<h5>1</h5>
-<ul>
-{% for tag in site.tags %}
-<li>{{ tag.tags }}</li>
-{% endfor %}
-</ul>
 
-
-<h2>Archive</h2>
+<h2>Archive by tag</h2>
 
 {% capture temptags %}
   {% for tag in site.tags %}

@@ -278,8 +278,13 @@ nav {
   background-color: $lightGray;
 }
 
-footer {
-  padding: 20px 0;
+.footer {
+  padding: 20px 0 0 0;
+  text-align: center;
+}
+
+.tags {
+  padding: 0 0 20px 0;
   text-align: center;
 }
 

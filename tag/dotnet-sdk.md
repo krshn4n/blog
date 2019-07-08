@@ -1,5 +1,5 @@
 ---
 layout: tagpage
 title: "Tag: dotnet-sdk"
-tags: dotnet-sdk
+tag: dotnet-sdk
 ---

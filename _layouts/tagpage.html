@@ -15,7 +15,7 @@ layout: default
   {% assign tagitems = temptag | split: '#' %}
   {% capture tagname %}{{ tagitems[1] }}{% endcapture %}
   
-  <li><a href="#{{ tagname }}"><nobr>{{ tagname }}</nobr></li>
+  <li><a href="#{{ tagname }}"><nobr>{{ tagname }}</nobr></a></li>
   
 {% endfor %}
 

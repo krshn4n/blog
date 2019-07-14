@@ -1,5 +1,5 @@
 ---
 layout: tagpage
-title: "Tag: serviceapi"
+title: "ServiceAPI"
 tag: serviceapi
 ---

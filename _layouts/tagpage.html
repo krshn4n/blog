@@ -10,7 +10,7 @@ layout: default
     {{ tag[0] }}
   {% endfor %}
 {% endcapture %}
-{% assign sortedtemptags = temptags sort  %}
+{% assign sortedtemptags = temptags | split:' ' | sort  %}
 {% for temptag in sortedtemptags %}
   
   {% capture tagname %}{{ temptag }}{% endcapture %}

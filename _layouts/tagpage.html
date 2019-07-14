@@ -7,13 +7,13 @@ layout: default
 <ul>
 {% capture temptags %}
   {% for tag in site.tags %}
-    {{ tag[1].size | plus: 1000 }}#{{ tag[0] }}#{{ tag[1].size }}
+    {{ tag[0] }}
   {% endfor %}
 {% endcapture %}
-{% assign sortedtemptags = temptags | split:' ' | sort | reverse %}
+{% assign sortedtemptags = temptags sort  %}
 {% for temptag in sortedtemptags %}
-  {% assign tagitems = temptag | split: '#' %}
-  {% capture tagname %}{{ tagitems[1] }}{% endcapture %}
+  
+  {% capture tagname %}{{ temptag }}{% endcapture %}
   
   <li><a href="#{{ tagname }}"><nobr>{{ tagname }}</nobr></a></li>
   

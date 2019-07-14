@@ -1,5 +1,5 @@
 ---
 layout: tagpage
-title: "WebDrawer"
+title: "WebDrawer Gallery"
 tag: webdrawer-gallery
 ---

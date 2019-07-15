@@ -63,7 +63,7 @@
 		[
   {% for tag in page.tags %}
     {% capture tag_name %}{{ tag }}{% endcapture %}
-    <a href="/blog/tag/archive/#{{ tag_name }}"><code class="highligher-rouge"><nobr>{{ tag_name }}</nobr></code>&nbsp;</a>
+    <a href="/tag/archive/#{{ tag_name }}"><code class="highligher-rouge"><nobr>{{ tag_name }}</nobr></code>&nbsp;</a>
   {% endfor %}
 ]
   {% endif %}

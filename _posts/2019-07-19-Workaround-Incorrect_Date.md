@@ -8,7 +8,9 @@ type: post
 published: true
 ---
 
-When posting a date to an Additional Field in the web service the date returned in the response is incorrect, even though the date set in CM is correct.  The problem is caused by a bug in handling time zone offsets.  The scenarios in this post assume that all actors (web service, client, WGS) are using the same time-zone settings.
+When posting a date to an Additional Field in the web service the date returned in the response is incorrect, even though the date set in CM is correct.  The problem is caused by a bug in handling time zone offsets.  The scenarios in this post assume that:
+ * all actors (web service, client, WGS) are using the same time-zone settings, and
+ * dates are always sent as UTC (not local) dates.
 
 ### Example with C# client
 

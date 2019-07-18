@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Update to site
+title: Workaround for incorrect date returned in Additional Fields
 categories: []
 tags: serviceapi
 status: publish
@@ -36,28 +36,25 @@ foreach (var rec in response.Results)
 
 The response from this code looks like this, even though the dates should be the same.
 
-```
-18/07/2019 4:03:19 AM
-18/07/2019 2:03:19 PM
-```
+![alt text](https://raw.githubusercontent.com/content-manager-sdk/blog/master/images/date_different.PNG "dates different")
 
 But the dates in the cM client are correct, I am at UTC+10 so 2:03PM is correct for 4:03 AM UTC.
 
-![alt text](/images/dates_same.png "dates in CM")
+![alt text](https://github.com/content-manager-sdk/blog/raw/master/images/dates_same.PNG "dates in CM")
 
 ### Example with JSON Http Post
 Posting the JSON below is the equivalent to the C# code above
 
-````json
+```javascript
 {
 	"Uri":9000000221,
 	"RecordDateDue":"2019-07-18T04:03:19Z",	"Fields": {"DateOfIssue": "2019-07-18T04:03:19Z"}
 }
-````
+```
 
 The response looks like this:
 
-```json
+```javascript
 {
     "Results": [
         {

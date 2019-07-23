@@ -47,7 +47,7 @@ But the dates in the cM client are correct, I am at UTC+10 so 2:03PM is correct 
 ### Example with JSON Http Post
 Posting the JSON below is the equivalent to the C# code above
 
-```javascript
+```JSON5
 {
 	"Uri":9000000221,
 	"RecordDateDue":"2019-07-18T04:03:19Z",	"Fields": {"DateOfIssue": "2019-07-18T04:03:19Z"}
@@ -56,7 +56,7 @@ Posting the JSON below is the equivalent to the C# code above
 
 The response looks like this:
 
-```javascript
+```JSON5
 {
     "Results": [
         {

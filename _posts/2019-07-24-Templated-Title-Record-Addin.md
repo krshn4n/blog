@@ -12,4 +12,4 @@ This new [sample add-in](https://github.com/content-manager-sdk/Community/tree/m
 
 I have included a version agnostic downloadable [DLL](https://github.com/content-manager-sdk/Community/blob/master/Samples/SDK/CSharp/SampleAddInCustomTitle/DLL/SampleAddIn.zip) for those who want to try it 'as-is'.
 
-<iframe src="https://player.vimeo.com/video/349780836?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="grouped_search_results" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+<iframe src="https://player.vimeo.com/video/349780836?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="templated title add-in" allow="autoplay; fullscreen" allowfullscreen=""></iframe>

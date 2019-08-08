@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Authenticiating in the web client and Office integration with Azure AD
+title: Authenticating in the web client and Office integration with Azure AD
 categories: []
 tags: azure-ad web-client office-integration
 status: publish

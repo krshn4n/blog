@@ -20,6 +20,25 @@ meta: {}
         <span class="cm-string cm-property">"RecordRelationshipRelationType"</span>: <span class="cm-string">"IsAltIn"</span>
     }]
 }</pre>
+
+<h1>An example with triggers</h1>
+<p>This sample creates a new Schedule and also a trigger for that schedule, to add the trigger to an existing Schedule use the Uri property instead of Name and Title.  Determine which properties are available for the ChildTriggers array using the page <pre>help/ChildCollections</pre> in the ServiceAPI help.</p>
+<p>Post the following to the /Schedule endpoint.
+
+<pre class="source-code">
+{
+
+    "ScheduleTitle": "My Test",
+	"ScheduleName":"8",
+    "ChildTriggers": [{
+    	"ScheduleTriggerTriggerType":"Destroyed",
+    	"ScheduleTriggerDelayType":"Days",
+    	"ScheduleTriggerAfterDays":20,
+    	"ScheduleTriggerDateType":"ContentDateFinalized"
+    }]
+}
+</pre>
+
 <h1>And a video...</h1>
  
    <iframe src="https://player.vimeo.com/video/260170534?wmode=opaque" width="640" height="400" frameborder="0" title="AltIn" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>

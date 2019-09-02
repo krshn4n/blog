@@ -15,11 +15,11 @@ meta: {}
    <iframe src="https://player.vimeo.com/video/339012290?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="JSON error in file download" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
    
    <h3>A note for users of CM 9.1</h3>
-<p>In 9.1 there is a bug which causes the HTML error page to be returned with the HTTP status code, rather than an error code.  If you return JSON then you will get an appropriate error code (probably a 500).  To fix 9.2:</p>
+<p>In 9.1 there is a bug which causes the HTML error page to be returned with the HTTP status code 200, rather than an error code.  If you return JSON then you will get an appropriate error code (probably a 500).  To fix 9.2:</p>
 <ol>
 <li>edit the file: \RazorPages\GlobalErrors.cshtml</li>
 <li>add this code into the head: this.Response.StatusCode = 500;</li>
 </ol>
  <h4>Example</h4>
- <img src="images/error_code.png" />
+ <img src="/images/error_code.png" />
 </body></html>

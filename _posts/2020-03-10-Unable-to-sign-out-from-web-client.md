@@ -9,7 +9,7 @@ published: true
 ---
 
 I stumbled on an odd problem the other day. A CM web client instance authenticating use WS-Fed (ADFS). The user could sign-in without problem but when they attempted to sign-out they got the response below.
-![](images/auth_response_xml.png)
+![](/images/auth_response_xml.png)
 
 The problem is that the Continue parameter in the sign out URL (see below) was not firing. The process to sign out is a two step on, first call the logout service to clear the web service session and then call the WS-Fed logout via the Continue parameter.
 

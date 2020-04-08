@@ -59,3 +59,16 @@ To use the Azure AD app created above edit hptrim.config (hprmServiceAPI.config 
 	</authentication>
 )
 ```
+
+### Logout
+
+For WebDrawer the logout link is configured in the uiSettings. It should contain '~/auth/logout'. In the Web Client a logout link will be displayed automatically when OpenId Connect authentication is enabled.
+
+#### Example
+
+```json
+  <uiSettings
+    logoutLink="~/auth/logout"
+	...
+  />
+```

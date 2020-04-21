@@ -35,7 +35,7 @@ From Certificates and Secrets add a secret and copy it some where you can find i
 
 ![](/images/azuread_secret.png)
 
-### Configure hptrim.config
+### Configure authentication in hptrim.config
 
 To use the Azure AD app created above edit hptrim.config (hprmServiceAPI.config in the Web Client) so that it has am authentication similar to the one below.
 
@@ -58,6 +58,14 @@ To use the Azure AD app created above edit hptrim.config (hprmServiceAPI.config 
 		</openIdConnect>
 	</authentication>
 ```
+
+### Enable redirect
+
+The web client will not re-direct the authentication endpoint unless the Html feature is enabled in hprmServiceAPI.config. To do this:
+
+1.  edit hprmServiceAPI.config
+2.  find the property named 'serviceFeatures'
+3.  Add the feature Html
 
 ### Logout
 

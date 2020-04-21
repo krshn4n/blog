@@ -79,3 +79,8 @@ For WebDrawer the logout link is configured in the uiSettings. It should contain
 	...
   />
 ```
+
+### Allow anonymous access in the IIS
+
+IIS will not be handling authentication so we use IIS Manager to allow anonymous access only.
+![image 1](/images/iis_anon.PNG)

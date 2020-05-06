@@ -10,7 +10,6 @@ meta: {}
 ---
 
 ## Overview
-
 Search strings are required for searching in the web service and can be convenient in the .Net SDK, there are a few rules on how to compose these strings but if I need to compose a complex search to get baked into an application I like to use the Content Manager client to assist me.
 
 ### Composing the search string

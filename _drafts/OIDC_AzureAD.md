@@ -21,7 +21,8 @@ To create the Azure AD application:
 1. Go to App Registrations and select New Registration.
 1. Enter a name.
 1. Under Redirect URI leave Web selected.
-1. The value in the Redirect URI is important, it must be lowercase and it must be the URL to your application (e.g. https://mydomain.com/CMWebDrawer) followed by the path to the authentication provider (for example /auth/openid). The /auth/ component is fixed but the 'openid' is the name you will supply in hptrim.config later and so can be any string, as long as it matches the value in hptrim.config.
+1. The value in the Redirect URI is important, it must be lowercase and it must be the URL to your application (e.g. https://mydomain.com/cmwebdrawer) followed by the path to the authentication provider (for example /auth/openid). The /auth/ component is fixed but the 'openid' is the name you will supply in hptrim.config later and so can be any string, as long as it matches the value in hptrim.config.
+For the web client the path must include the path to the ServiceAPI, for example: https://mydomain.com/contentManager/serviceapi/auth/openid.
 
 #### Example
 
@@ -51,9 +52,9 @@ To use the Azure AD app created above edit hptrim.config (hprmServiceAPI.config 
 		<openIdConnect>
 			<add
 				name="openid"
-				clientID="ae39011d-52e7-4ecc-b9eb-6c5accee8c19"
-				clientSecret="_MqVMUc8N70DBZeQ[xfswG[sp3GrMfD:"
-				issuerURI="https://login.microsoftonline.com/08363ee4-6592-4325-9d5a-5a25e00d482b/v2.0/.well-known/openid-configuration"
+				clientID="ae39011d-52e7-4ecc-b9eb-87d6d876dd"
+				clientSecret="_MqXXXXXXXXXXXXXXXG[sp3GrMfD:"
+				issuerURI="https://login.microsoftonline.com/08363ee4-6592-4325-9d5a-123456789/v2.0/.well-known/openid-configuration"
 			/>
 		</openIdConnect>
 	</authentication>

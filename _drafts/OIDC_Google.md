@@ -21,7 +21,7 @@ To create the Google credentials:
 2.  Select Credentials > OAuth Client ID,
 3.  Set Application type to 'Web Application'.
 4.  Add your domain in the Authorized JavaScript origins
-5.  The value in Authorized redirect URIs is important, it must be lowercase and it must be the URL to your application (e.g. https://mydomain.com/CMWebDrawer) followed by the path to the authentication provider (for example /auth/openid). The /auth/ component is fixed but the 'openid' is the name you will supply in hptrim.config later and so can be any string, as long as it matches the value in hptrim.config.
+5.  The value in Authorized redirect URIs is important, it must be lowercase and it must be the URL to your application (e.g. https://mydomain.com/cmwebdrawer) followed by the path to the authentication provider (for example /auth/openid). The /auth/ component is fixed but the 'openid' is the name you will supply in hptrim.config later and so can be any string, as long as it matches the value in hptrim.config. For the web client the path must include the path to the ServiceAPI, for example: https://mydomain.com/contentManager/serviceapi/auth/openid.
 6.  On saving the Client ID and Client Secret will be displayed, preserve them for later use.
 
 #### Example
@@ -44,8 +44,8 @@ To use the Google credentials created above edit hptrim.config (hprmServiceAPI.c
 		<openIdConnect>
 			<add
 				name="openid"
-				clientID="741419278958-cdn3tbbbomrrbk71le811cr0nnjtpilb.apps.googleusercontent.com"
-				clientSecret="jl-BiX298Z1khwNRO5L0W15f"
+				clientID="741419278958-abcdefghijklmemopqrs.apps.googleusercontent.com"
+				clientSecret="jl-BiX7685hjgf76857y"
 				issuerURI="https://accounts.google.com"
 			/>
 		</openIdConnect>

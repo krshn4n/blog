@@ -17,7 +17,7 @@ The default 'My Documents' may be set in the registry using the key 'OfficeCheck
 
 ### Global Setting (for Web Client)
 
-When connecting to CM via the Web Client, the registry setting above is not used and instead the 'My Documents' will always be located in the path `%AppData%\\Micro Focus\\Content Manager\\[DatabaseID]\\OfficeCheckouts`.
+When connecting to CM via the Web Client, the registry setting above is not used and instead the 'My Documents' will always be located in the path `%AppData%\Micro Focus\Content Manager\[DatabaseID]\OfficeCheckouts`.
 
 ### Overriding the default
 

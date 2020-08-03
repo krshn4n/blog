@@ -1,6 +1,6 @@
 ---
 layout: family
-title: David Churchland
+title: Jane, David and kids
 permalink: /family/
 ---
 

@@ -1,6 +1,6 @@
 ---
 layout: family
-title: Jane, David and kids
+title: Jane David and kids
 permalink: /family/
 ---
 

@@ -4,6 +4,12 @@ title: Jane David and kids
 permalink: /family/
 ---
 
+### James playing some songs on the piano
+<iframe src="https://player.vimeo.com/video/447739173?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+
+### Luke and James on the trampoline
+<iframe src="https://player.vimeo.com/video/447742896?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+
 ### Luke learning to ride
 
 <iframe src="https://player.vimeo.com/video/443552491?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>

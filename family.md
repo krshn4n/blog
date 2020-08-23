@@ -4,6 +4,14 @@ title: Jane David and kids
 permalink: /family/
 ---
 
+### Dancing
+Sometimes Luke even dances to the music, at other times he just runs around crazily.
+<iframe src="https://player.vimeo.com/video/449585537?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+
+### Excercises
+To make up for not going out to school the boys do some excercises most days.
+<iframe src="https://player.vimeo.com/video/448448774?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+
 ### Luke playing in a puddle
 <iframe src="https://player.vimeo.com/video/448028593?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
 

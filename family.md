@@ -4,6 +4,14 @@ title: Jane David and kids
 permalink: /family/
 ---
 
+### Relaxing
+The boys doing what they do best.
+<iframe src="https://player.vimeo.com/video/448793454?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+
+### Trains
+Luke and James enjoy driving the Lego trains.
+<iframe src="https://player.vimeo.com/video/448225264?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+
 ### Dancing
 Sometimes Luke even dances to the music, at other times he just runs around crazily.
 <iframe src="https://player.vimeo.com/video/449585537?app_id=122963&amp;wmode=opaque" width="640" height="400" frameborder="0" title="Power BI" allow="autoplay; fullscreen" allowfullscreen=""></iframe>

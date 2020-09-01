@@ -48,4 +48,4 @@ Next go back to the Schedule element inside 'routeDefaults' and modify it to loo
 
 ### What is going on here
 
-The code that displays properties on a page looks for display properties in the customPropertySets. The properties listed in each property set are displayed in a seperate section on the page, in the case of Schedule
+The code that displays properties on a page looks for display properties in the customPropertySets. The properties listed in each property set are displayed in a separate section on the page, in the case of Schedule there is only one property set. Properties listed in the properties attribute of the routeDefault are not displayed, they are included as a list of properties required for internal use.

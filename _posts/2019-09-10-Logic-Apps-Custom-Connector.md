@@ -2,7 +2,7 @@
 layout: post
 title: Logic Apps (and Flow) Custom Connector
 categories: []
-tags: serviceapi
+tags: serviceapi logic-apps
 status: publish
 type: post
 published: true

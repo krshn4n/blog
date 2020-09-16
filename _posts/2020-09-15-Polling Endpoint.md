@@ -13,7 +13,7 @@ Logic apps triggers were discussed in a [previous post](http://hprm.info/Logic-A
 
 ### triggerState
 
-While the polling endpoint supports most of the query parameters of normal searches it also supports a parameter called 'triggerState' which expects a datetime value in the format `YYYY-MM-DDThh:mm:ssTZD`, for example `2020-09-15T05:05:42Z`. The polling endpoint will do a search that includes both the standard 'q' query parameter and the query `updated>triggerState`.
+While the polling endpoint supports most of the query parameters of normal searches it also supports a parameter called 'triggerState' which expects a datetime value in the format `YYYY-MM-DDThh:mm:ssTZD`, for example `2020-09-15T05:05:42Z`. The polling endpoint will do a search that includes both the standard 'q' query parameter and the query `updated>triggerState`{:.js}.
 
 ### Location header in response
 

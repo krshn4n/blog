@@ -23,7 +23,7 @@ The search response will contain a [`location`](https://developer.mozilla.org/en
 
 In addition to the location header the response will also contain a [`retry-after`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After) header, this tells the consumer how long to wait until sending the next request. If there is a subsequent page in the current result set then retry-after will be 0, if not it will be 15.
 
-### Examples
+### Location header examples
 
 #### Original request
 

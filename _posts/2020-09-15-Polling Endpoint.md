@@ -13,7 +13,7 @@ Logic apps triggers were discussed in a [previous post](http://hprm.info/Logic-A
 
 ### triggerState
 
-While the polling endpoint supports most of the query parameters of normal searches it also supports a parameter called 'triggerState' which expects a datetime value in the format `YYYY-MM-DDThh:mm:ssTZD`, for example `2020-09-15T05:05:42Z`. The polling endpoint will do a search that includes both the standard 'q' query parameter and the query `updated>triggerState`{:.js}.
+While the polling endpoint supports most of the query parameters of normal searches it also supports a parameter called 'triggerState' which expects a datetime value in the format `YYYY-MM-DDThh:mm:ssTZD`, for example `2020-09-15T05:05:42Z`. The polling endpoint will do a search that includes both the standard 'q' query parameter and the query 'updated>triggerState'.
 
 ### Location header in response
 
@@ -33,12 +33,12 @@ https://MyServer/ServiceAPI/Polling?q=all&trimType=Record&resultsOnly=true&pageS
 
 #### Loction header if no more matching records
 
-```ruby
+```bash
 https://MyServer/ServiceAPI/Polling?q=all&trimType=Record&resultsOnly=true&pageSize=2&triggerState=2020-09-16T02:25:44Z&start=0
 ```
 
 #### Location header if there are more matching Records
 
-```js
+```bash
 https://MyServer/ServiceAPI/Polling?q=all&trimType=Record&resultsOnly=true&pageSize=2&triggerState=2020-09-15T05:05:42Z&start=30`
 ```

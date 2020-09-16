@@ -31,7 +31,7 @@ In addition to the location header the response will also contain a [`retry-afte
 https://MyServer/ServiceAPI/Polling?q=all&trimType=Record&resultsOnly=true&pageSize=30&triggerState=2020-09-15T05:05:42Z
 ```
 
-#### Loction header if no more matching records
+#### Location header if no more matching records
 
 ```bash
 https://MyServer/ServiceAPI/Polling?q=all&trimType=Record&resultsOnly=true&pageSize=2&triggerState=2020-09-16T02:25:44Z&start=0

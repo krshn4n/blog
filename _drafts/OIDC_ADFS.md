@@ -11,7 +11,7 @@ meta: {}
 
 ## Overview
 
-As of CM 10 the CM web applications (ServiceAPI, WebDrawer and Web Client) have an OpenId Connect authentication provider built in. This document describes creating an AD Fs application and configuring the CM web application.
+As of CM 10 the CM web applications (ServiceAPI, WebDrawer and Web Client) have an OpenId Connect authentication provider built in. This document describes creating an AD FS application and configuring the CM web application.
 
 ### Create the AD FS  Application
 
@@ -22,7 +22,7 @@ To create the AD FS application:
 1. Enter a name.
 1. press Next
 1. take note of the client identifier
-1. add a Redirect URI. The redirect URI must be all in lowercase and be the URL of the Content Manager web site with the suffix '/serviceapi/auth/openid.  For example: https://myserver/contentmanager/serviceapi/auth/openid.
+1. add a Redirect URI. The redirect URI must be all in lowercase and be the URL of the Content Manager web site with the suffix '/serviceapi/auth/openid.  For example: `https://myserver/contentmanager/serviceapi/auth/openid`.
 1. press Next
 1. Generate a shared secret and take note of this secret
 1. press next

@@ -34,9 +34,16 @@ To create the AD FS application:
 
 #### Examples
 
+##### New AD FS application
 ![](/images/oidc_adfs_1.png)
+
+##### Add Redirect URI
 ![](/images/oidc_adfs_2.png)
+
+##### Generate Secret
 ![](/images/oidc_adfs_3.png)
+
+##### Specify Web API identifier
 ![](/images/oidc_adfs_4.png)
 
 
@@ -81,8 +88,13 @@ The office integration requires an access token to allow it ro authenticate with
 
 #### Examples
 
+##### Add nativae application
 ![](/images/oidc_adfs_5.png)
+
+##### Add permissions for native application
 ![](/images/oidc_adfs_6.png)
+
+##### Specifiy claims to be included in token
 ![](/images/oidc_adfs_7.png)
 
 ### Add office integration the settings to the Web Client

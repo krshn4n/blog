@@ -26,7 +26,7 @@ To create the AD FS application:
 1. press Next
 1. Generate a shared secret and take note of this secret
 1. press next
-1. add an identifier, for example: https://MyServer/contentmanager/
+1. add an identifier, for example: `https://MyServer/contentmanager/`
 1. press next
 1. choose an access control policy (for example: 'Give access to everyone
 1. In 'Configure Application permissions select email, openid, and profile
@@ -46,6 +46,7 @@ To configure the Web Client  edit the hprmServiceApi.config file and add (or edi
  
  * Client Id and secret come from the previous section
  * issuerUri is found in the AD FS console - Endpoints, in the OpenID Connect section
+ * name must be 'openid'
 
 #### Example
 ```xml
@@ -70,13 +71,19 @@ The office integration requires an access token to allow it ro authenticate with
 1. comnplete the native application
 1. edit the Web API application and in Client Permissions add the new client application selecting the scopes email, openid and profile
 1. in Issuance Transform Rules add a new Rule 
-1. select 'Send LDAP Attributes 
+1. select 'Send LDAP Attributes' 
 1. select Next
 1. choose Active Directory as the attribute store
 1. mape these two claims, 
 	* Display Name - Name
 	* User-Principal-Name - UPN
 1. Finish
+
+#### Examples
+
+![](/images/oidc_adfs_5.png)
+![](/images/oidc_adfs_6.png)
+![](/images/oidc_adfs_7.png)
 
 ### Add office integration the settings to the Web Client
 
@@ -92,6 +99,6 @@ The office integration authentication settings are stored in the file ADFS\confi
 	<clientAuthority>https://acme.com/adfs</clientAuthority>
 	<clientResourceUri>https://acme.com/contentmanager/</clientResourceUri>
 	<clientID>ab762716-544d-4aeb-a526-687b73838a34</clientID>
-	<clientReturnUri>https://btpvm2237.myexch19.com/contentmanager/</clientReturnUri>
+	<clientReturnUri>https://acme.com/contentmanager/</clientReturnUri>
 </adfsClient>
 ```

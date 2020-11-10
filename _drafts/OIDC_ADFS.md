@@ -88,7 +88,7 @@ The office integration requires an access token to allow it ro authenticate with
 
 #### Examples
 
-##### Add nativae application
+##### Add native application
 ![](/images/oidc_adfs_5.png)
 
 ##### Add permissions for native application

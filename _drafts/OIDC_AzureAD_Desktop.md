@@ -23,7 +23,6 @@ To create the Azure AD application:
 1. Select 'Public native client' in the Redirect URI
 1. Enter this redirect Uri 'urn:ietf:wg:oauth:2.0:oob'
 
-
 #### Example
 
 ![](/images/azuread_app_desktop_1.png)
@@ -79,3 +78,8 @@ The office integration requires an access token to allow it ro authenticate with
 <clientReturnUri>http://MyWebClient</clientReturnUri>
 </adfsClient>
 ```
+
+### Troubleshooting Azure AD for Office Integration access
+
+#### Error AADSTS500011: The resource principal named https://MYSERVER/contentmanager/ was not found in the tenant named XXXX-XXXX-XXXXX-XXXXXX. 
+If you get this error try using the Client ID in clientResourceUri, rather than Application ID URI.

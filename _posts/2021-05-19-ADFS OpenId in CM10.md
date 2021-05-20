@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Adding a link in a Power BI Report
+title: OpenId for Content Manager 10 in ADFS
 categories: []
-tags: power-bi
+tags: adfs openid
 status: publish
 type: post
 published: true

@@ -3,8 +3,7 @@
 #
 
 # Name of your site (displayed in the header)
-name: Focus on Content Manager
-
+name: krshn4n's arcade
 # Short bio or description (displayed in the header)
 description: Web services, Web Drawer, SDK and more...
 
@@ -21,14 +20,14 @@ footer-links:
   email:
   facebook:
   flickr:
-  github: /content-manager-sdk/Community
-  instagram:
+  github: /krshn4n
+  instagram:@krshn4n
   linkedin:
   pinterest:
   rss: feed
   twitter: 
   vimeo: user39269912
-  community: https://community.microfocus.com/t5/Content-Manager-User-Discussions/bd-p/itrc-1015
+  community: 
   stackoverflow: # your stackoverflow profile, e.g. "users/50476/bart-kiers"
   youtube: # channel/<your_long_string> or user/<user-name>
   googleplus: # anything in your profile username that comes after plus.google.com/

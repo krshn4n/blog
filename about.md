@@ -1,12 +1,12 @@
 ---
 layout: page
-title: David Churchland
+title: loading...
 permalink: /about/
+published: true
 ---
 
 ### What
-
-Web sites, web applications and web services.  Connecting to Micro Focus  Content Manager.
+what?
 
 ### Warning!
 
